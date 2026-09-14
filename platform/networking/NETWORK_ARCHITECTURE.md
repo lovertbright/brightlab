@@ -2,8 +2,8 @@
 
 ## Summary
 
-The mkloudlab Kubernetes cluster uses **Cloudflare DNS + MetalLB + Istio Gateway API** for service access:
-- **Domain-based Access**: All services accessible via `*.maelkloud.com` subdomains
+The lbrightlab Kubernetes cluster uses **Cloudflare DNS + MetalLB + Istio Gateway API** for service access:
+- **Domain-based Access**: All services accessible via `*.lbrightlab.com` subdomains
 - **TLS Everywhere**: cert-manager with Let's Encrypt via Cloudflare DNS-01
 - **HTTP to HTTPS Redirect**: Automatic for all domains
 
@@ -13,14 +13,14 @@ The mkloudlab Kubernetes cluster uses **Cloudflare DNS + MetalLB + Istio Gateway
 ┌─────────────────────────────────────────────────────────────────────┐
 │                        SERVICE ACCESS                                │
 │                                                                       │
-│   Your Device → DNS (*.maelkloud.com) → MetalLB → Istio Gateway     │
+│   Your Device → DNS (*.lbrightlab.com) → MetalLB → Istio Gateway     │
 │                                                                       │
-│   ✅ keycloak.maelkloud.com (SSO & Identity)                         │
-│   ✅ grafana.maelkloud.com (Monitoring Dashboards)                   │
-│   ✅ prometheus.maelkloud.com (Metrics)                              │
-│   ✅ loki.maelkloud.com (Logs)                                       │
-│   ✅ tempo.maelkloud.com (Traces)                                    │
-│   ✅ alloy.maelkloud.com (Telemetry Collector)                       │
+│   ✅ keycloak.lbrightlab.com (SSO & Identity)                         │
+│   ✅ grafana.lbrightlab.com (Monitoring Dashboards)                   │
+│   ✅ prometheus.lbrightlab.com (Metrics)                              │
+│   ✅ loki.lbrightlab.com (Logs)                                       │
+│   ✅ tempo.lbrightlab.com (Traces)                                    │
+│   ✅ alloy.lbrightlab.com (Telemetry Collector)                       │
 └─────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -71,24 +71,24 @@ Each service has its own HTTPRoute:
 - **Certificates**: cert-manager with Let's Encrypt (Cloudflare DNS-01)
 
 ### All Services
-- **Keycloak** (keycloak.maelkloud.com) - SSO & Identity
-- **Grafana** (grafana.maelkloud.com) - Monitoring dashboards
-- **Prometheus** (prometheus.maelkloud.com) - Metrics
-- **Loki** (loki.maelkloud.com) - Logs
-- **Tempo** (tempo.maelkloud.com) - Traces
-- **Alloy** (alloy.maelkloud.com) - Telemetry collector
+- **Keycloak** (keycloak.lbrightlab.com) - SSO & Identity
+- **Grafana** (grafana.lbrightlab.com) - Monitoring dashboards
+- **Prometheus** (prometheus.lbrightlab.com) - Metrics
+- **Loki** (loki.lbrightlab.com) - Logs
+- **Tempo** (tempo.lbrightlab.com) - Traces
+- **Alloy** (alloy.lbrightlab.com) - Telemetry collector
 
 ## DNS Configuration
 
 ### External DNS (Cloudflare)
 - **Provider**: Cloudflare
 - **Auto-creates**: DNS records for Gateway resources
-- **Wildcard**: `*.maelkloud.com` → MetalLB LoadBalancer IP
+- **Wildcard**: `*.lbrightlab.com` → MetalLB LoadBalancer IP
 
 ### Local DNS (/etc/hosts)
 For local access without external DNS:
 ```bash
-172.16.16.150 keycloak.maelkloud.com grafana.maelkloud.com prometheus.maelkloud.com loki.maelkloud.com tempo.maelkloud.com alloy.maelkloud.com
+172.16.16.150 keycloak.lbrightlab.com grafana.lbrightlab.com prometheus.lbrightlab.com loki.lbrightlab.com tempo.lbrightlab.com alloy.lbrightlab.com
 ```
 
 ### Internal DNS
@@ -129,11 +129,11 @@ For local access without external DNS:
 ### From Local Network
 ```bash
 # Add to /etc/hosts (if not using external DNS)
-echo "172.16.16.150 keycloak.maelkloud.com grafana.maelkloud.com prometheus.maelkloud.com loki.maelkloud.com tempo.maelkloud.com alloy.maelkloud.com" | sudo tee -a /etc/hosts
+echo "172.16.16.150 keycloak.lbrightlab.com grafana.lbrightlab.com prometheus.lbrightlab.com loki.lbrightlab.com tempo.lbrightlab.com alloy.lbrightlab.com" | sudo tee -a /etc/hosts
 
 # Access via browser
-# https://grafana.maelkloud.com
-# https://keycloak.maelkloud.com
+# https://grafana.lbrightlab.com
+# https://keycloak.lbrightlab.com
 ```
 
 ### From Within Cluster
@@ -142,7 +142,7 @@ echo "172.16.16.150 keycloak.maelkloud.com grafana.maelkloud.com prometheus.mael
 curl http://grafana.observability.svc.cluster.local
 
 # Via gateway (same as external)
-curl -H "Host: grafana.maelkloud.com" http://main-gateway-istio.istio-system.svc.cluster.local
+curl -H "Host: grafana.lbrightlab.com" http://main-gateway-istio.istio-system.svc.cluster.local
 ```
 
 ## Troubleshooting
@@ -158,7 +158,7 @@ kubectl get svc main-gateway-istio -n istio-system
 **Test from within cluster:**
 ```bash
 kubectl run test --image=nicolaka/netshoot -it --rm -- \
-  curl -H "Host: grafana.maelkloud.com" http://172.16.16.150
+  curl -H "Host: grafana.lbrightlab.com" http://172.16.16.150
 ```
 
 ### 404 from Gateway

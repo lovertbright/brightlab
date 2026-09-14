@@ -108,7 +108,7 @@ kubectl describe storageclass <storage-class-name>
 
 #### Symptoms
 
-- `gitrepository/mkloudlab` shows: `failed to checkout and determine revision: unable to clone ... dial tcp: lookup github.com on 10.96.0.10:53: server misbehaving`
+- `gitrepository/lbrightlab` shows: `failed to checkout and determine revision: unable to clone ... dial tcp: lookup github.com on 10.96.0.10:53: server misbehaving`
 - Kustomizations show: `Source artifact not found, retrying in 30s`
 
 #### Cause
@@ -122,7 +122,7 @@ Patch CoreDNS to use reliable upstream DNS, then restart Flux reconciliation:
 ```bash
 task fix:dns
 # Wait for CoreDNS rollout, then trigger Flux to retry
-flux reconcile source git mkloudlab -n flux-system
+flux reconcile source git lbrightlab -n flux-system
 task flux:status
 ```
 

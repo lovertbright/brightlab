@@ -9,7 +9,7 @@ spec:
   duration: 2160h
   renewBefore: 360h
   dnsNames:
-    - minio.maelkloud.com
+    - minio.lbrightlab.com
   issuerRef:
     name: letsencrypt-dns-cloudflare
     kind: ClusterIssuer
@@ -25,7 +25,7 @@ spec:
   duration: 2160h
   renewBefore: 360h
   dnsNames:
-    - minio-console.maelkloud.com
+    - minio-console.lbrightlab.com
   issuerRef:
     name: letsencrypt-dns-cloudflare
     kind: ClusterIssuer

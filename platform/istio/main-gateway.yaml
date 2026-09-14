@@ -7,21 +7,21 @@ metadata:
   annotations:
     # Configure the gateway service to use LoadBalancer
     networking.istio.io/service-type: "LoadBalancer"
-    external-dns.alpha.kubernetes.io/hostname: "*.maelkloud.com"
+    external-dns.alpha.kubernetes.io/hostname: "*.lbrightlab.com"
 spec:
   gatewayClassName: istio
   listeners:
     - name: http
       port: 80
       protocol: HTTP
-      hostname: "*.maelkloud.com"
+      hostname: "*.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All
     - name: https-keycloak
       port: 443
       protocol: HTTPS
-      hostname: "keycloak.maelkloud.com"
+      hostname: "keycloak.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All
@@ -34,7 +34,7 @@ spec:
     - name: https-grafana
       port: 443
       protocol: HTTPS
-      hostname: "grafana.maelkloud.com"
+      hostname: "grafana.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All
@@ -47,7 +47,7 @@ spec:
     - name: https-prometheus
       port: 443
       protocol: HTTPS
-      hostname: "prometheus.maelkloud.com"
+      hostname: "prometheus.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All
@@ -60,7 +60,7 @@ spec:
     - name: https-loki
       port: 443
       protocol: HTTPS
-      hostname: "loki.maelkloud.com"
+      hostname: "loki.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All
@@ -73,7 +73,7 @@ spec:
     - name: https-tempo
       port: 443
       protocol: HTTPS
-      hostname: "tempo.maelkloud.com"
+      hostname: "tempo.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All
@@ -86,7 +86,7 @@ spec:
     - name: https-alloy
       port: 443
       protocol: HTTPS
-      hostname: "alloy.maelkloud.com"
+      hostname: "alloy.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All
@@ -99,7 +99,7 @@ spec:
     - name: https-minio
       port: 443
       protocol: HTTPS
-      hostname: "minio.maelkloud.com"
+      hostname: "minio.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All
@@ -112,7 +112,7 @@ spec:
     - name: https-minio-console
       port: 443
       protocol: HTTPS
-      hostname: "minio-console.maelkloud.com"
+      hostname: "minio-console.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All
@@ -125,7 +125,7 @@ spec:
     - name: https-neuvector
       port: 443
       protocol: HTTPS
-      hostname: "neuvector.maelkloud.com"
+      hostname: "neuvector.lbrightlab.com"
       allowedRoutes:
         namespaces:
           from: All

@@ -134,7 +134,7 @@ echo "7. DNS Resolution Test..."
 echo "-------------------------"
 if [ -n "$LB_IP" ]; then
     echo "Testing DNS resolution for services..."
-    DOMAINS=("keycloak.maelkloud.com" "grafana.maelkloud.com" "prometheus.maelkloud.com" "loki.maelkloud.com" "tempo.maelkloud.com" "alloy.maelkloud.com")
+    DOMAINS=("keycloak.lbrightlab.com" "grafana.lbrightlab.com" "prometheus.lbrightlab.com" "loki.lbrightlab.com" "tempo.lbrightlab.com" "alloy.lbrightlab.com")
     
     for DOMAIN in "${DOMAINS[@]}"; do
         if command -v dig &> /dev/null; then
@@ -175,5 +175,5 @@ echo ""
 echo "Next steps:"
 echo "1. If LoadBalancer IP is assigned, check Cloudflare DNS records"
 echo "2. Wait for external-dns to create/update DNS records (may take a few minutes)"
-echo "3. Test HTTPS access: curl -I https://keycloak.maelkloud.com"
+echo "3. Test HTTPS access: curl -I https://keycloak.lbrightlab.com"
 echo ""

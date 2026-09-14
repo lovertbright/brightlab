@@ -1,4 +1,4 @@
-# mkloudlab - Available Tasks
+# lbrightlab - Available Tasks
 
 This file is auto-generated. Run `task docs` to update.
 
@@ -22,7 +22,7 @@ task: Available tasks for this project:
 * certificates:configure-token:       Configure Cloudflare API token for certificate issuance
 * certificates:describe:              Describe certificate issues for troubleshooting
 * certificates:status:                Check certificate status across all namespaces
-* dns:check:                          Check DNS resolution for maelkloud.com subdomains
+* dns:check:                          Check DNS resolution for lbrightlab.com subdomains
 * flux:configure-repo:                Configure Flux GitRepository (required for GitOps)
 * flux:status:                        Show Flux status
 * flux:sync-all:                      Force reconcile all Flux resources

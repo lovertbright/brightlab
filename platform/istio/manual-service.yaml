@@ -4,7 +4,7 @@ metadata:
   name: main-gateway-istio
   namespace: istio-system
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: "*.maelkloud.com"
+    external-dns.alpha.kubernetes.io/hostname: "*.lbrightlab.com"
   labels:
     istio.io/gateway-name: main-gateway
 spec:

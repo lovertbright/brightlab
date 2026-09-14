@@ -12,10 +12,10 @@ All services use HTTPS with valid Let's Encrypt certificates. Always use `https:
 
 | Service | URL | Description |
 |---------|-----|-------------|
-| **Grafana** | https://grafana.maelkloud.com | Observability dashboards |
-| **Keycloak** | https://keycloak.maelkloud.com | Identity management |
-| **Prometheus** | https://prometheus.maelkloud.com | Metrics & monitoring |
-| **Alloy** | https://alloy.maelkloud.com | Telemetry collector |
+| **Grafana** | https://grafana.lbrightlab.com | Observability dashboards |
+| **Keycloak** | https://keycloak.lbrightlab.com | Identity management |
+| **Prometheus** | https://prometheus.lbrightlab.com | Metrics & monitoring |
+| **Alloy** | https://alloy.lbrightlab.com | Telemetry collector |
 
 ---
 
@@ -23,13 +23,13 @@ All services use HTTPS with valid Let's Encrypt certificates. Always use `https:
 
 These services are **APIs** and don't have web interfaces. Don't try to access them in a browser:
 
-### Tempo (http://tempo.maelkloud.com)
+### Tempo (http://tempo.lbrightlab.com)
 - **Type:** Distributed tracing backend
 - **Used by:** Grafana (as a data source)
 - **Access:** Only via API or Grafana
 - **Why 404:** No web UI exists
 
-### Loki (http://loki.maelkloud.com)
+### Loki (http://loki.lbrightlab.com)
 - **Type:** Log aggregation system
 - **Used by:** Grafana (as a data source)
 - **Access:** Only via API or Grafana
@@ -41,14 +41,14 @@ These services are **APIs** and don't have web interfaces. Don't try to access t
 
 ### View Tempo Traces in Grafana
 
-1. Open https://grafana.maelkloud.com
+1. Open https://grafana.lbrightlab.com
 2. Go to **Explore**
 3. Select **Tempo** as data source
 4. Query traces
 
 ### View Loki Logs in Grafana
 
-1. Open https://grafana.maelkloud.com
+1. Open https://grafana.lbrightlab.com
 2. Go to **Explore**
 3. Select **Loki** as data source
 4. Query logs using LogQL
@@ -62,8 +62,8 @@ These services are **APIs** and don't have web interfaces. Don't try to access t
 **Problem:** Accessing via `http://` instead of `https://`
 
 **Solution:**
-✅ Use `https://grafana.maelkloud.com`
-❌ Don't use `http://grafana.maelkloud.com`
+✅ Use `https://grafana.lbrightlab.com`
+❌ Don't use `http://grafana.lbrightlab.com`
 
 All services have valid Let's Encrypt certificates for HTTPS.
 
@@ -101,11 +101,11 @@ Use them through Grafana instead.
 
 ## 🚀 Recommended Workflow
 
-1. **Start with Grafana:** https://grafana.maelkloud.com
+1. **Start with Grafana:** https://grafana.lbrightlab.com
    - View all metrics, logs, and traces here
    - Access Prometheus, Loki, and Tempo data sources
 
-2. **Manage Users:** https://keycloak.maelkloud.com
+2. **Manage Users:** https://keycloak.lbrightlab.com
    - Configure authentication
    - Manage user access
 
@@ -125,12 +125,12 @@ Use them through Grafana instead.
 Copy these to your browser:
 
 ```
-https://grafana.maelkloud.com
-https://keycloak.maelkloud.com
-https://prometheus.maelkloud.com
-https://alloy.maelkloud.com
+https://grafana.lbrightlab.com
+https://keycloak.lbrightlab.com
+https://prometheus.lbrightlab.com
+https://alloy.lbrightlab.com
 ```
 
 **Do NOT access:**
-- tempo.maelkloud.com (no web UI)
-- loki.maelkloud.com (no web UI)
+- tempo.lbrightlab.com (no web UI)
+- loki.lbrightlab.com (no web UI)

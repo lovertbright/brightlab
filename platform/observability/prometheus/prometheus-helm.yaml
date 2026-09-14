@@ -24,7 +24,7 @@ spec:
       prometheusSpec:
         fullnameOverride: prometheus-server
         # Configure external URL for reverse proxy
-        externalUrl: "https://prometheus.maelkloud.com"
+        externalUrl: "https://prometheus.lbrightlab.com"
         routePrefix: "/"
         service:
           port: 80

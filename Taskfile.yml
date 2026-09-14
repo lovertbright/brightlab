@@ -3,8 +3,8 @@ version: '3'
 vars:
   FLUX_NAMESPACE: flux-system
   KUBECTL_TIMEOUT: 300s
-  PROJECT_NAME: mkloudlab
-  GIT_REPO_URL: "https://github.com/xmaeltht/mkloudlab.git"
+  PROJECT_NAME: lbrightlab
+  GIT_REPO_URL: "https://github.com/lovertbright/brightlab.git"
 
 includes:
   terraform:
@@ -147,7 +147,7 @@ tasks:
       - echo "Configuring Flux GitRepository..."
       - kubectl apply -f platform/flux/manifests/git-repository.yaml
       - echo "Waiting for GitRepository to be ready..."
-      - kubectl wait --for=condition=ready --timeout=60s gitrepository/mkloudlab -n {{.FLUX_NAMESPACE}} || true
+      - kubectl wait --for=condition=ready --timeout=60s gitrepository/lbrightlab -n {{.FLUX_NAMESPACE}} || true
       - echo "✅ GitRepository configured"
 
   flux:sync-all:
@@ -156,7 +156,7 @@ tasks:
       - echo "Reconciling all Flux resources..."
       - |
         if command -v flux &> /dev/null; then
-          flux reconcile source git mkloudlab -n {{.FLUX_NAMESPACE}}
+          flux reconcile source git lbrightlab -n {{.FLUX_NAMESPACE}}
           for kustomization in $(kubectl get kustomizations -n {{.FLUX_NAMESPACE}} -o name 2>/dev/null); do
             echo "Reconciling $kustomization..."
             flux reconcile kustomization $(echo $kustomization | cut -d/ -f2) -n {{.FLUX_NAMESPACE}} || true
@@ -529,8 +529,8 @@ tasks:
       - kubectl get certificates -A --no-headers 2>/dev/null | grep -c "True" | xargs echo "Ready Certificates:"
       - 'kubectl get certificates -A --no-headers 2>/dev/null | grep -cv "True" | xargs echo "Pending Certificates:" || echo "Pending Certificates: 0"'
       - echo -e "\n=== DNS Resolution ==="
-      - 'nslookup keycloak.maelkloud.com >/dev/null 2>&1 && echo "Keycloak DNS: ✓" || echo "Keycloak DNS: ✗"'
-      - 'nslookup grafana.maelkloud.com >/dev/null 2>&1 && echo "Grafana DNS: ✓" || echo "Grafana DNS: ✗"'
+      - 'nslookup keycloak.lbrightlab.com >/dev/null 2>&1 && echo "Keycloak DNS: ✓" || echo "Keycloak DNS: ✗"'
+      - 'nslookup grafana.lbrightlab.com >/dev/null 2>&1 && echo "Grafana DNS: ✓" || echo "Grafana DNS: ✗"'
       - echo -e "\n=== Security Status ==="
       - kubectl get networkpolicies -A --no-headers | wc -l | xargs echo "Network Policies:"
       - kubectl get namespaces -l pod-security.kubernetes.io/enforce=restricted --no-headers | wc -l | xargs echo "Restricted Namespaces:"
@@ -565,13 +565,13 @@ tasks:
       - kubectl get httproutes -A -o wide 2>/dev/null || echo "No HTTP routes found"
 
   dns:check:
-    desc: Check DNS resolution for maelkloud.com subdomains
+    desc: Check DNS resolution for lbrightlab.com subdomains
     cmds:
       - echo "=== DNS Resolution Check ==="
       - |
         for subdomain in grafana keycloak prometheus alloy; do
-          echo -n "$subdomain.maelkloud.com: "
-          nslookup $subdomain.maelkloud.com >/dev/null 2>&1 && echo "✓ Resolved" || echo "✗ Failed"
+          echo -n "$subdomain.lbrightlab.com: "
+          nslookup $subdomain.lbrightlab.com >/dev/null 2>&1 && echo "✓ Resolved" || echo "✗ Failed"
         done
 
   # =============================================================================
@@ -663,12 +663,12 @@ tasks:
     cmds:
       - echo "=== Service Access URLs ==="
       - 'echo "Flux: Use `flux get all -n flux-system` to view status"'
-      - 'echo "Grafana: https://grafana.maelkloud.com"'
-      - 'echo "Keycloak: https://keycloak.maelkloud.com"'
-      - 'echo "Prometheus: https://prometheus.maelkloud.com"'
-      - 'echo "MinIO API: https://minio.maelkloud.com"'
-      - 'echo "MinIO Console: https://minio-console.maelkloud.com"'
-      - 'echo "NeuVector: https://neuvector.maelkloud.com"'
+      - 'echo "Grafana: https://grafana.lbrightlab.com"'
+      - 'echo "Keycloak: https://keycloak.lbrightlab.com"'
+      - 'echo "Prometheus: https://prometheus.lbrightlab.com"'
+      - 'echo "MinIO API: https://minio.lbrightlab.com"'
+      - 'echo "MinIO Console: https://minio-console.lbrightlab.com"'
+      - 'echo "NeuVector: https://neuvector.lbrightlab.com"'
       - echo ""
       - echo "=== Gateway Status ==="
       - kubectl get gateways -A 2>/dev/null || echo "No gateways found"

@@ -12,7 +12,7 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: loki.maelkloud.com
+      hostname: loki.lbrightlab.com
       tls:
         mode: Terminate
         certificateRefs:
@@ -29,7 +29,7 @@ spec:
     - name: main-gateway
       namespace: istio-system
   hostnames:
-    - loki.maelkloud.com
+    - loki.lbrightlab.com
   rules:
     - backendRefs:
         - name: loki

@@ -2,7 +2,7 @@
 
 ## 📚 Overview
 
-This directory contains comprehensive runbooks for operating the Mkloudlab Kubernetes GitOps environment. Each runbook provides detailed procedures for specific operational scenarios.
+This directory contains comprehensive runbooks for operating the Lbrightlab Kubernetes GitOps environment. Each runbook provides detailed procedures for specific operational scenarios.
 
 ## 📖 Available Runbooks
 

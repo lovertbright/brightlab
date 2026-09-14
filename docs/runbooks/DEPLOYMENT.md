@@ -2,7 +2,7 @@
 
 ## 🚀 Deployment Overview
 
-This runbook covers the complete deployment process for the Mkloudlab Kubernetes GitOps environment, from initial setup to production deployment.
+This runbook covers the complete deployment process for the Lbrightlab Kubernetes GitOps environment, from initial setup to production deployment.
 
 ## 📋 Prerequisites Checklist
 
@@ -10,7 +10,7 @@ This runbook covers the complete deployment process for the Mkloudlab Kubernetes
 
 - [ ] **Kubernetes cluster** (v1.24+)
 - [ ] **kubectl** configured and tested
-- [ ] **Domain name** configured (maelkloud.com)
+- [ ] **Domain name** configured (lbrightlab.com)
 - [ ] **DNS records** pointing to cluster
 - [ ] **Storage class** available (local-path)
 - [ ] **Load balancer** configured (MetalLB or cloud LB)

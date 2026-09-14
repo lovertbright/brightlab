@@ -12,7 +12,7 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: tempo.maelkloud.com
+      hostname: tempo.lbrightlab.com
       tls:
         mode: Terminate
         certificateRefs:
@@ -29,7 +29,7 @@ spec:
     - name: main-gateway
       namespace: istio-system
   hostnames:
-    - tempo.maelkloud.com
+    - tempo.lbrightlab.com
   rules:
     - backendRefs:
         - name: tempo

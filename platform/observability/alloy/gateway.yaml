@@ -12,7 +12,7 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: alloy.maelkloud.com
+      hostname: alloy.lbrightlab.com
       tls:
         mode: Terminate
         certificateRefs:
@@ -29,7 +29,7 @@ spec:
     - name: main-gateway
       namespace: istio-system
   hostnames:
-    - alloy.maelkloud.com
+    - alloy.lbrightlab.com
   rules:
     - backendRefs:
         - name: alloy

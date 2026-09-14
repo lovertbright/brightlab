@@ -7,9 +7,9 @@ If DNS records are pointing to an old IP (e.g., `172.16.16.100` instead of `172.
 ### 1. Check Current DNS Resolution
 
 ```bash
-dig keycloak.maelkloud.com
+dig keycloak.lbrightlab.com
 # or
-nslookup keycloak.maelkloud.com
+nslookup keycloak.lbrightlab.com
 ```
 
 ### 2. Verify LoadBalancer IP
@@ -35,7 +35,7 @@ Look for:
 
 1. Log into Cloudflare dashboard
 2. Go to DNS → Records
-3. Look for A records for `*.maelkloud.com` or individual subdomains
+3. Look for A records for `*.lbrightlab.com` or individual subdomains
 4. Check if they point to the old IP (`172.16.16.100`)
 
 ### 5. Solutions
@@ -73,7 +73,7 @@ If external-dns is not updating records:
 1. **Add/Update annotation** on the service to trigger sync:
    ```bash
    kubectl annotate svc main-gateway-istio -n istio-system \
-     external-dns.alpha.kubernetes.io/hostname="*.maelkloud.com" \
+     external-dns.alpha.kubernetes.io/hostname="*.lbrightlab.com" \
      --overwrite
    ```
 
@@ -88,7 +88,7 @@ After applying fixes, verify:
 
 ```bash
 # Check DNS resolution
-dig keycloak.maelkloud.com
+dig keycloak.lbrightlab.com
 
 # Should resolve to the LoadBalancer IP (e.g., 172.16.16.150)
 ```
@@ -129,8 +129,8 @@ dig keycloak.maelkloud.com
 1. DNS changes can take 2-5 minutes to propagate
 2. Use different DNS servers to test:
    ```bash
-   dig @8.8.8.8 keycloak.maelkloud.com
-   dig @1.1.1.1 keycloak.maelkloud.com
+   dig @8.8.8.8 keycloak.lbrightlab.com
+   dig @1.1.1.1 keycloak.lbrightlab.com
    ```
 3. Clear local DNS cache if needed
 
@@ -153,9 +153,9 @@ This will:
 Current configuration:
 - **Provider**: Cloudflare
 - **Sources**: service, ingress, istio-gateway, istio-virtualservice
-- **Domain Filter**: maelkloud.com
+- **Domain Filter**: lbrightlab.com
 - **Policy**: sync (manages records automatically)
-- **TXT Owner ID**: mkloudlab
+- **TXT Owner ID**: lbrightlab
 
 ## Manual DNS Record Creation
 
@@ -170,7 +170,7 @@ If external-dns is not working, you can manually create DNS records:
 
 2. **Individual Records** (if needed):
    - Create A records for each subdomain:
-     - `keycloak.maelkloud.com` → `<LoadBalancer IP>`
+     - `keycloak.lbrightlab.com` → `<LoadBalancer IP>`
      - etc.
 
 **Note**: If using Cloudflare proxy (orange cloud), ensure SSL/TLS mode is set to "Full" or "Full (strict)" for HTTPS to work.

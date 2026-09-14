@@ -1,4 +1,4 @@
-# Mkloudlab Taskfile Quick Start Guide
+# Lbrightlab Taskfile Quick Start Guide
 
 This guide helps you get started with the Taskfile automation for your Kubernetes GitOps repository.
 
@@ -264,16 +264,16 @@ export TEMPO_OTLP_GRPC_ENDPOINT=tempo-tempo-distributor.observability.svc.cluste
 export TEMPO_OTLP_HTTP_ENDPOINT=http://tempo-tempo-distributor.observability.svc.cluster.local:4318
 ```
 
-Access services via your maelkloud.com domain:
+Access services via your lbrightlab.com domain:
 
 ```bash
 # Show all service URLs and their status
 task access
 
 # Direct URLs (once deployed and certificates are ready):
-# ArgoCD:    https://argocd.maelkloud.com
-# Grafana:   https://grafana.maelkloud.com
-# Keycloak:  https://keycloak.maelkloud.com
+# ArgoCD:    https://argocd.lbrightlab.com
+# Grafana:   https://grafana.lbrightlab.com
+# Keycloak:  https://keycloak.lbrightlab.com
 ```
 
 ## Cleanup Operations

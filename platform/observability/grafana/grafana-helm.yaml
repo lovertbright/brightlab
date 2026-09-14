@@ -35,8 +35,8 @@ spec:
     # Configure Grafana to work behind reverse proxy
     grafana.ini:
       server:
-        domain: grafana.maelkloud.com
-        root_url: https://grafana.maelkloud.com
+        domain: grafana.lbrightlab.com
+        root_url: https://grafana.lbrightlab.com
         serve_from_sub_path: false
         enable_gzip: true
         protocol: http
@@ -48,7 +48,7 @@ spec:
         cookie_secure: false
         cookie_samesite: lax
         allow_embedding: true
-        csrf_trusted_origins: https://grafana.maelkloud.com
+        csrf_trusted_origins: https://grafana.lbrightlab.com
         csrf_additional_headers: X-Forwarded-For
       # Logging for debugging
       log:
@@ -64,8 +64,8 @@ spec:
 
     # Environment variables for proper reverse proxy operation
     env:
-      GF_SERVER_ROOT_URL: https://grafana.maelkloud.com
-      GF_SERVER_DOMAIN: grafana.maelkloud.com
+      GF_SERVER_ROOT_URL: https://grafana.lbrightlab.com
+      GF_SERVER_DOMAIN: grafana.lbrightlab.com
       GF_SERVER_ENFORCE_DOMAIN: "false"
       GF_SECURITY_COOKIE_SECURE: "false"
       GF_SECURITY_COOKIE_SAMESITE: "lax"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Interactive local deployment for Mkloudlab
+# Interactive local deployment for Lbrightlab
 # Guides you through: Vagrant cluster → Prerequisites → Flux → Apps
 #
 set -e

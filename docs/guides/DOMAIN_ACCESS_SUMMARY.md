@@ -2,7 +2,7 @@
 
 ## What Was Implemented
 
-This document summarizes the changes made to enable domain-based access to all services via `*.maelkloud.com` subdomains.
+This document summarizes the changes made to enable domain-based access to all services via `*.lbrightlab.com` subdomains.
 
 ## Files Created/Modified
 
@@ -39,7 +39,7 @@ This document summarizes the changes made to enable domain-based access to all s
 ```
 Internet
    ↓
-Cloudflare DNS (*.maelkloud.com → LoadBalancer IP)
+Cloudflare DNS (*.lbrightlab.com → LoadBalancer IP)
    ↓
 MetalLB LoadBalancer (172.16.16.150-172.16.16.250)
    ↓
@@ -54,19 +54,19 @@ Backend Services
 
 | Service | Domain | Namespace | Backend Service | Port |
 |---------|--------|-----------|-----------------|------|
-| Keycloak | keycloak.maelkloud.com | keycloak | keycloak-keycloak-keycloakx-http | 80 |
-| Grafana | grafana.maelkloud.com | observability | grafana | 80 |
-| Prometheus | prometheus.maelkloud.com | observability | prometheus-server | 80 |
-| Loki | loki.maelkloud.com | observability | loki | 3100 |
-| Tempo | tempo.maelkloud.com | observability | tempo | 3200 |
-| Alloy | alloy.maelkloud.com | observability | alloy-gateway | 12345 |
+| Keycloak | keycloak.lbrightlab.com | keycloak | keycloak-keycloak-keycloakx-http | 80 |
+| Grafana | grafana.lbrightlab.com | observability | grafana | 80 |
+| Prometheus | prometheus.lbrightlab.com | observability | prometheus-server | 80 |
+| Loki | loki.lbrightlab.com | observability | loki | 3100 |
+| Tempo | tempo.lbrightlab.com | observability | tempo | 3200 |
+| Alloy | alloy.lbrightlab.com | observability | alloy-gateway | 12345 |
 
 ## Key Components
 
 ### 1. Main Gateway
 - **Location**: `istio-system` namespace
 - **Type**: LoadBalancer (allowed by Kyverno exception)
-- **Function**: Single entry point for all `*.maelkloud.com` traffic
+- **Function**: Single entry point for all `*.lbrightlab.com` traffic
 - **TLS**: Terminates TLS with service-specific certificates
 
 ### 2. HTTPRoutes
@@ -77,7 +77,7 @@ Backend Services
 ### 3. External-DNS
 - **Function**: Automatically creates DNS records in Cloudflare
 - **Configuration**: Watches Gateway resources and LoadBalancer services
-- **DNS Record**: Wildcard A record `*.maelkloud.com` → LoadBalancer IP
+- **DNS Record**: Wildcard A record `*.lbrightlab.com` → LoadBalancer IP
 
 ### 4. MetalLB
 - **Function**: Provides LoadBalancer IP for main gateway
@@ -121,7 +121,7 @@ Backend Services
 
 7. **Test Access**:
    ```bash
-   curl -I https://keycloak.maelkloud.com
+   curl -I https://keycloak.lbrightlab.com
    ```
 
 ## Verification Checklist
@@ -131,8 +131,8 @@ Backend Services
 - [ ] All HTTPRoutes exist and reference main-gateway (`kubectl get httproute -A`)
 - [ ] All certificates are ready (`kubectl get certificate -A`)
 - [ ] External-DNS pod is running (`kubectl get pods -n networking -l app.kubernetes.io/name=external-dns`)
-- [ ] DNS records created in Cloudflare (check Cloudflare dashboard or use `dig *.maelkloud.com`)
-- [ ] HTTPS access works (`curl -I https://keycloak.maelkloud.com`)
+- [ ] DNS records created in Cloudflare (check Cloudflare dashboard or use `dig *.lbrightlab.com`)
+- [ ] HTTPS access works (`curl -I https://keycloak.lbrightlab.com`)
 
 ## Troubleshooting
 

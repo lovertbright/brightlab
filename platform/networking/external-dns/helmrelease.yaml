@@ -30,6 +30,6 @@ spec:
             name: cloudflare-api-token-secret
             key: api-token
     domainFilters:
-      - maelkloud.com
+      - lbrightlab.com
     policy: sync
-    txtOwnerId: mkloudlab
+    txtOwnerId: lbrightlab

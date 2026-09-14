@@ -4,7 +4,7 @@ terraform {
   # to properly secure your state file and enable locking.
   #
   # backend "s3" {
-  #   bucket = "mkloudlab"
+  #   bucket = "lbrightlab"
   #   key    = "keycloak/terraform.tfstate"
   #   region = "us-east-1"
   # }
@@ -29,7 +29,7 @@ resource "keycloak_realm" "main" {
   count        = var.create_realm ? 1 : 0
   realm        = var.realm_name
   enabled      = true
-  display_name = "MaelKloud Realm"
+  display_name = "Lbrightlab Realm"
 
   login_with_email_allowed = true
   duplicate_emails_allowed = false
@@ -55,20 +55,20 @@ locals {
 
 resource "keycloak_group" "admin_group" {
   realm_id = local.realm_id
-  name     = "maelkloud-admins"
+  name     = "lbrightlab-admins"
 }
 
 locals {
   oidc_clients = {
     grafana = {
       name          = "Grafana"
-      redirect_uris = ["https://grafana.maelkloud.com/login/generic_oauth"]
-      web_origins   = ["https://grafana.maelkloud.com"]
+      redirect_uris = ["https://grafana.lbrightlab.com/login/generic_oauth"]
+      web_origins   = ["https://grafana.lbrightlab.com"]
     },
     prometheus = {
       name          = "Prometheus"
-      redirect_uris = ["https://prometheus.maelkloud.com/oauth/callback"]
-      web_origins   = ["https://prometheus.maelkloud.com"]
+      redirect_uris = ["https://prometheus.lbrightlab.com/oauth/callback"]
+      web_origins   = ["https://prometheus.lbrightlab.com"]
     }
   }
 }
@@ -88,7 +88,7 @@ resource "keycloak_openid_client" "oidc_clients" {
   access_type = "CONFIDENTIAL"
 
   valid_redirect_uris = each.value.redirect_uris
-  base_url            = "https://${each.key}.maelkloud.com"
+  base_url            = "https://${each.key}.lbrightlab.com"
   web_origins         = each.value.web_origins
 }
 

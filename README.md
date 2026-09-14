@@ -1,8 +1,17 @@
-# Mkloudlab - Kubernetes GitOps Repository
+# Lbrightlab - Kubernetes GitOps Repository
 
-Mkloudlab is a production-grade Kubernetes platform managed via GitOps (Flux CD). It bundles infrastructure provisioning, platform services, and observability into a single, automated repository.
+Lbrightlab is a production-grade Kubernetes platform managed via GitOps (Flux CD). It bundles infrastructure provisioning, platform services, and observability into a single, automated repository.
+
+All services are exposed under **`lbrightlab.com`** (e.g. `grafana.lbrightlab.com`, `keycloak.lbrightlab.com`) via Cloudflare DNS + Istio Gateway API. If you're forking this repo for your own domain, see [Configuring your own domain](#-configuring-your-own-domain) before you deploy.
 
 ## 🚀 Quick Start
+
+### 0. Clone this repository
+
+```bash
+git clone https://github.com/lovertbright/brightlab.git
+cd brightlab
+```
 
 ### Interactive local deployment (recommended)
 
@@ -29,6 +38,7 @@ Ensure you have the following installed:
 - **Vagrant** & **VirtualBox** (for local cluster)
 - **Task** (Automation tool): `brew install go-task/tap/go-task`
 - **Kubectl** & **Flux CLI**: `curl -s https://fluxcd.io/install.sh | sudo bash`
+- A **Cloudflare account** with the `lbrightlab.com` zone added (needed for DNS + TLS — see below)
 
 ### 2. Infrastructure (Vagrant)
 Provision the local Kubernetes cluster.
@@ -49,7 +59,9 @@ Install essential cluster components (Gateway API, Storage, Cert-Manager) and se
 # 1. Install Prerequisites
 task install:prerequisites
 
-# 2. Cloudflare Token (optional, for TLS)
+# 2. Cloudflare Token (needed for DNS-01 TLS certs + external-dns)
+# Create a token at https://dash.cloudflare.com/profile/api-tokens with
+# Zone:DNS:Edit and Zone:Zone:Read permissions, scoped to the lbrightlab.com zone.
 export CLOUDFLARE_API_TOKEN=your_token
 task certificates:configure-token
 ```
@@ -76,6 +88,24 @@ flux get all -n flux-system
 ### 5. Post-Installation
 Configure sensitive resources that are not in Git.
 - **Keycloak & Secrets**: See `infrastructure/terraform/keycloak-realm`.
+
+---
+
+## 🌐 Configuring your own domain
+
+This repo ships pre-configured for `lbrightlab.com`. To point it at your own domain instead, update these locations before running `task deploy:local`:
+
+| What | File | Setting |
+| --- | --- | --- |
+| Service hostnames | `platform/istio/httproutes.yaml`, `platform/*/gateway.yaml`, `platform/*/certificate.yaml` | Replace `*.lbrightlab.com` with `*.yourdomain.com` |
+| External-DNS zone filter | `platform/networking/external-dns/helmrelease.yaml` | `domainFilters` and `txtOwnerId` |
+| ACME (Let's Encrypt) contact email | `platform/cert-manager/cluster-issuer.yaml` | `spec.acme.email` |
+| Keycloak realm defaults | `infrastructure/terraform/keycloak-realm/variable.tf` | `kc_url` default |
+| Flux GitRepository source | `platform/flux/manifests/git-repository.yaml`, `Taskfile.yml` (`GIT_REPO_URL`) | Point at your fork's URL |
+
+A quick way to find every occurrence: `grep -rl "lbrightlab" --exclude-dir=.git .`
+
+You'll also need your domain's zone added to Cloudflare (for DNS-01 cert validation and External-DNS record management) before step 3 above.
 
 ---
 

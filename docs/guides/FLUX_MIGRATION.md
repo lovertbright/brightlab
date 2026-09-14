@@ -104,7 +104,7 @@ flux get helmreleases -n flux-system
 
 ### Force Reconciliation
 ```bash
-flux reconcile source git mkloudlab -n flux-system
+flux reconcile source git lbrightlab -n flux-system
 flux reconcile kustomization <name> -n flux-system
 flux reconcile helmrelease <name> -n flux-system
 ```
@@ -120,7 +120,7 @@ kubectl logs -n flux-system -l app.kubernetes.io/name=helm-controller
 
 ### GitRepository Not Ready
 ```bash
-kubectl describe gitrepository mkloudlab -n flux-system
+kubectl describe gitrepository lbrightlab -n flux-system
 # Check for authentication issues or network problems
 ```
 

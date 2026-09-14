@@ -8,7 +8,7 @@ spec:
   duration: 2160h
   renewBefore: 360h
   dnsNames:
-    - loki.maelkloud.com
+    - loki.lbrightlab.com
   issuerRef:
     name: letsencrypt-dns-cloudflare
     kind: ClusterIssuer

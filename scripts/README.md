@@ -1,6 +1,6 @@
 # Scripts Directory
 
-This directory contains utility scripts for managing and troubleshooting the mkloudlab Kubernetes cluster.
+This directory contains utility scripts for managing and troubleshooting the lbrightlab Kubernetes cluster.
 
 ## Setup & Installation Scripts
 

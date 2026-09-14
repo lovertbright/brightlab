@@ -1,6 +1,6 @@
 # Domain-Based Service Access Setup
 
-This guide explains how services are exposed via domain names (e.g., `keycloak.maelkloud.com`, `grafana.maelkloud.com`) using Istio Gateway API, MetalLB, and External-DNS.
+This guide explains how services are exposed via domain names (e.g., `keycloak.lbrightlab.com`, `grafana.lbrightlab.com`) using Istio Gateway API, MetalLB, and External-DNS.
 
 ## Quick Start
 
@@ -49,20 +49,20 @@ Once DNS records are created (may take a few minutes):
 
 ```bash
 # Test HTTPS access
-curl -I https://keycloak.maelkloud.com
-curl -I https://grafana.maelkloud.com
-curl -I https://alloy.maelkloud.com
+curl -I https://keycloak.lbrightlab.com
+curl -I https://grafana.lbrightlab.com
+curl -I https://alloy.lbrightlab.com
 ```
 
 ## Overview
 
-All services are accessible via their respective subdomains under `maelkloud.com`:
-- **Keycloak**: `keycloak.maelkloud.com`
-- **Grafana**: `grafana.maelkloud.com`
-- **Prometheus**: `prometheus.maelkloud.com`
-- **Loki**: `loki.maelkloud.com`
-- **Tempo**: `tempo.maelkloud.com`
-- **Alloy**: `alloy.maelkloud.com`
+All services are accessible via their respective subdomains under `lbrightlab.com`:
+- **Keycloak**: `keycloak.lbrightlab.com`
+- **Grafana**: `grafana.lbrightlab.com`
+- **Prometheus**: `prometheus.lbrightlab.com`
+- **Loki**: `loki.lbrightlab.com`
+- **Tempo**: `tempo.lbrightlab.com`
+- **Alloy**: `alloy.lbrightlab.com`
 
 ## Architecture
 
@@ -70,7 +70,7 @@ All services are accessible via their respective subdomains under `maelkloud.com
 
 1. **Main Gateway** (`platform/istio/main-gateway.yaml`)
    - Single LoadBalancer Gateway in `istio-system` namespace
-   - Handles all incoming traffic for `*.maelkloud.com`
+   - Handles all incoming traffic for `*.lbrightlab.com`
    - Uses MetalLB to provide external IP
    - TLS termination with service-specific certificates
 
@@ -85,7 +85,7 @@ All services are accessible via their respective subdomains under `maelkloud.com
 4. **External-DNS** (`platform/networking/external-dns/`)
    - Automatically creates DNS records in Cloudflare
    - Watches Gateway resources and LoadBalancer services
-   - Creates wildcard A record: `*.maelkloud.com` → LoadBalancer IP
+   - Creates wildcard A record: `*.lbrightlab.com` → LoadBalancer IP
 
 5. **Cert-Manager**
    - Issues and manages TLS certificates for each service
@@ -102,9 +102,9 @@ All services are accessible via their respective subdomains under `maelkloud.com
 
 The main gateway is configured with:
 - **LoadBalancer service type** (allowed by Kyverno policy exception)
-- **Wildcard hostname**: `*.maelkloud.com`
+- **Wildcard hostname**: `*.lbrightlab.com`
 - **Individual HTTPS listeners** for each service with their specific certificates
-- **External-DNS annotation**: `external-dns.alpha.kubernetes.io/hostname: "*.maelkloud.com"`
+- **External-DNS annotation**: `external-dns.alpha.kubernetes.io/hostname: "*.lbrightlab.com"`
 
 ### HTTPRoute Resources
 
@@ -125,7 +125,7 @@ spec:
     - name: main-gateway
       namespace: istio-system
   hostnames:
-    - keycloak.maelkloud.com
+    - keycloak.lbrightlab.com
   rules:
     - backendRefs:
         - name: keycloak-keycloak-keycloakx-http
@@ -151,7 +151,7 @@ The Kyverno policy `gateway-service-clusterip`:
 External-DNS automatically:
 1. Detects the LoadBalancer service created by the main gateway
 2. Reads the `external-dns.alpha.kubernetes.io/hostname` annotation
-3. Creates a wildcard A record in Cloudflare: `*.maelkloud.com` → LoadBalancer IP
+3. Creates a wildcard A record in Cloudflare: `*.lbrightlab.com` → LoadBalancer IP
 4. Updates the record if the LoadBalancer IP changes
 
 ### Manual DNS Setup (if needed)
@@ -203,8 +203,8 @@ kubectl describe certificate <cert-name> -n <namespace>
 
 ```bash
 # Query DNS for a service
-dig keycloak.maelkloud.com
-nslookup keycloak.maelkloud.com
+dig keycloak.lbrightlab.com
+nslookup keycloak.lbrightlab.com
 
 # Check external-dns logs
 kubectl logs -n networking -l app.kubernetes.io/name=external-dns
@@ -214,9 +214,9 @@ kubectl logs -n networking -l app.kubernetes.io/name=external-dns
 
 ```bash
 # Test HTTPS access (should return 200 or service-specific response)
-curl -I https://keycloak.maelkloud.com
-curl -I https://grafana.maelkloud.com
-curl -I https://alloy.maelkloud.com
+curl -I https://keycloak.lbrightlab.com
+curl -I https://grafana.lbrightlab.com
+curl -I https://alloy.lbrightlab.com
 ```
 
 ## Troubleshooting
@@ -243,7 +243,7 @@ curl -I https://alloy.maelkloud.com
 
 4. **Check DNS Records**:
    ```bash
-   dig *.maelkloud.com
+   dig *.lbrightlab.com
    ```
    Verify the wildcard DNS record points to the LoadBalancer IP.
 
@@ -322,7 +322,7 @@ To add a new service:
    spec:
      secretName: <service>-cert
      dnsNames:
-       - <service>.maelkloud.com
+       - <service>.lbrightlab.com
      issuerRef:
        name: letsencrypt-dns-cloudflare
        kind: ClusterIssuer
@@ -334,7 +334,7 @@ To add a new service:
    - name: https-<service>
      port: 443
      protocol: HTTPS
-     hostname: "<service>.maelkloud.com"
+     hostname: "<service>.lbrightlab.com"
      tls:
        mode: Terminate
        certificateRefs:
@@ -357,7 +357,7 @@ To add a new service:
        - name: main-gateway
          namespace: istio-system
      hostnames:
-       - <service>.maelkloud.com
+       - <service>.lbrightlab.com
      rules:
        - backendRefs:
            - name: <service-name>

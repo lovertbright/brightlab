@@ -10,13 +10,13 @@ CONTROLLER_USER="root"
 CONTROLLER_PASSWORD="kubeadmin"
 KUBECONFIG_DIR="$HOME/.kube"
 KUBECONFIG_DEFAULT="$KUBECONFIG_DIR/config"
-KUBECONFIG_NEW="$KUBECONFIG_DIR/config.mkloudlab"
+KUBECONFIG_NEW="$KUBECONFIG_DIR/config.lbrightlab"
 
-echo "🔐 Setting up kubeconfig for mkloudlab local access..."
+echo "🔐 Setting up kubeconfig for lbrightlab local access..."
 # Remove the old context if it exists
-kubectl config delete-context mkloudlab >/dev/null 2>&1 || true
-kubectl config delete-cluster mkloudlab >/dev/null 2>&1 || true
-kubectl config delete-user mkloudlab >/dev/null 2>&1 || true
+kubectl config delete-context lbrightlab >/dev/null 2>&1 || true
+kubectl config delete-cluster lbrightlab >/dev/null 2>&1 || true
+kubectl config delete-user lbrightlab >/dev/null 2>&1 || true
 
 # Create .kube directory in home if it doesn't exist
 if [ ! -d "$KUBECONFIG_DIR" ]; then
@@ -44,7 +44,7 @@ fi
 chmod 600 "$KUBECONFIG_NEW"
 
 # Modify the new kubeconfig (Context/User/Cluster renaming to avoid conflicts)
-echo "🔄 Configuring context as 'mkloudlab'..."
+echo "🔄 Configuring context as 'lbrightlab'..."
 
 # Normalize line endings (avoid sed $ not matching on CRLF)
 if command -v tr >/dev/null 2>&1; then
@@ -61,13 +61,13 @@ sed -i.bak2 '/certificate-authority-data:/d' "$KUBECONFIG_NEW"
 # We replace the private IP with localhost since port 6443 is forwarded
 awk -v ip="$CONTROLLER_IP" '$0 ~ ("server: https://" ip ":6443") { print "    server: https://127.0.0.1:6443"; print "    insecure-skip-tls-verify: true"; next } 1' "$KUBECONFIG_NEW" > "${KUBECONFIG_NEW}.tmp" && mv "${KUBECONFIG_NEW}.tmp" "$KUBECONFIG_NEW"
 
-# Rename context, user, and cluster to 'mkloudlab'
+# Rename context, user, and cluster to 'lbrightlab'
 # Use global replace for context name (works with trailing space or no $); only this string appears as context name
-sed -i.bak4 's/kubernetes-admin@kubernetes/mkloudlab/g' "$KUBECONFIG_NEW"
-sed -i.bak5 's/name: kubernetes$/name: mkloudlab/' "$KUBECONFIG_NEW"
-sed -i.bak6 's/cluster: kubernetes$/cluster: mkloudlab/' "$KUBECONFIG_NEW"
-sed -i.bak7 's/user: kubernetes-admin$/user: mkloudlab/' "$KUBECONFIG_NEW"
-sed -i.bak8 's/name: kubernetes-admin$/name: mkloudlab/' "$KUBECONFIG_NEW"
+sed -i.bak4 's/kubernetes-admin@kubernetes/lbrightlab/g' "$KUBECONFIG_NEW"
+sed -i.bak5 's/name: kubernetes$/name: lbrightlab/' "$KUBECONFIG_NEW"
+sed -i.bak6 's/cluster: kubernetes$/cluster: lbrightlab/' "$KUBECONFIG_NEW"
+sed -i.bak7 's/user: kubernetes-admin$/user: lbrightlab/' "$KUBECONFIG_NEW"
+sed -i.bak8 's/name: kubernetes-admin$/name: lbrightlab/' "$KUBECONFIG_NEW"
 
 # Clean up backups
 rm -f "${KUBECONFIG_NEW}.bak"*
@@ -79,15 +79,15 @@ echo "Merging with existing kubeconfig..."
 if [ -f "$KUBECONFIG_DEFAULT" ]; then
     cp "$KUBECONFIG_DEFAULT" "${KUBECONFIG_DEFAULT}.bak"
     
-    # Remove existing mkloudlab context if it exists to ensure we use the new one
+    # Remove existing lbrightlab context if it exists to ensure we use the new one
     # We do this on the DEFAULT file using a temporary KUBECONFIG env
     (
         export KUBECONFIG="$KUBECONFIG_DEFAULT"
-        if kubectl config get-contexts mkloudlab >/dev/null 2>&1; then
-             echo "   Removing existing 'mkloudlab' context to prevent conflicts..."
-             kubectl config delete-context mkloudlab >/dev/null 2>&1 || true
-             kubectl config delete-cluster mkloudlab >/dev/null 2>&1 || true
-             kubectl config delete-user mkloudlab >/dev/null 2>&1 || true
+        if kubectl config get-contexts lbrightlab >/dev/null 2>&1; then
+             echo "   Removing existing 'lbrightlab' context to prevent conflicts..."
+             kubectl config delete-context lbrightlab >/dev/null 2>&1 || true
+             kubectl config delete-cluster lbrightlab >/dev/null 2>&1 || true
+             kubectl config delete-user lbrightlab >/dev/null 2>&1 || true
         fi
     )
 
@@ -112,11 +112,11 @@ rm -f "$KUBECONFIG_NEW"
 export KUBECONFIG="$KUBECONFIG_DEFAULT"
 
 echo ""
-echo "🔄 Switching to context 'mkloudlab'..."
-if kubectl config get-contexts mkloudlab &>/dev/null; then
-    kubectl config use-context mkloudlab
+echo "🔄 Switching to context 'lbrightlab'..."
+if kubectl config get-contexts lbrightlab &>/dev/null; then
+    kubectl config use-context lbrightlab
     echo ""
-    echo "🎉 Context 'mkloudlab' is ready and active!"
+    echo "🎉 Context 'lbrightlab' is ready and active!"
 else
     # Fallback: set current-context to the context that points to our cluster (127.0.0.1:6443)
     CONTEXT_FOR_6443=$(kubectl config get-contexts -o name 2>/dev/null | while read -r ctx; do
@@ -129,9 +129,9 @@ else
         kubectl config use-context "$CONTEXT_FOR_6443"
         echo ""
         echo "✅ Switched to context '$CONTEXT_FOR_6443' (cluster at 127.0.0.1:6443)."
-        echo "   To rename it to 'mkloudlab': kubectl config rename-context '$CONTEXT_FOR_6443' mkloudlab"
+        echo "   To rename it to 'lbrightlab': kubectl config rename-context '$CONTEXT_FOR_6443' lbrightlab"
     else
-        echo "⚠️  Context 'mkloudlab' not found in merged config. Available contexts:"
+        echo "⚠️  Context 'lbrightlab' not found in merged config. Available contexts:"
         kubectl config get-contexts -o name 2>/dev/null || true
         echo "   Run: kubectl config use-context <name> to select your cluster."
         exit 1

@@ -219,7 +219,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: admin@maelkloud.com
+    email: admin@lbrightlab.com
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
@@ -240,7 +240,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: admin@maelkloud.com
+    email: admin@lbrightlab.com
     privateKeySecretRef:
       name: letsencrypt-dns-cloudflare
     solvers:

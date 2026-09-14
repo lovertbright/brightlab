@@ -13,13 +13,13 @@ variable "kc_admin_pass" {
 variable "kc_url" {
   description = "Keycloak URL"
   type        = string
-  default     = "https://keycloak.maelkloud.com"
+  default     = "https://keycloak.lbrightlab.com"
 }
 
 variable "realm_name" {
   description = "Name of the Keycloak realm"
   type        = string
-  default     = "mkloud"
+  default     = "lbrightlab"
 }
 
 variable "create_realm" {

@@ -9,7 +9,7 @@ spec:
   prune: false
   sourceRef:
     kind: GitRepository
-    name: mkloudlab
+    name: lbrightlab
     namespace: flux-system
   dependsOn:
     - name: networking-config

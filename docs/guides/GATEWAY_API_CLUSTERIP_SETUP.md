@@ -46,17 +46,17 @@ Two mechanisms ensure no LoadBalancer services are created:
 
 The following applications are configured with Gateway API:
 
-- **Keycloak**: `keycloak.maelkloud.com`
-- **Grafana**: `grafana.maelkloud.com`
-- **Prometheus**: `prometheus.maelkloud.com`
-- **Loki**: `loki.maelkloud.com`
-- **Tempo**: `tempo.maelkloud.com`
+- **Keycloak**: `keycloak.lbrightlab.com`
+- **Grafana**: `grafana.lbrightlab.com`
+- **Prometheus**: `prometheus.lbrightlab.com`
+- **Loki**: `loki.lbrightlab.com`
+- **Tempo**: `tempo.lbrightlab.com`
 
 ## Main Gateway (Optional)
 
 A shared main gateway configuration is available in `platform/istio/main-gateway.yaml`:
 - Namespace: `istio-system`
-- Hostname: `*.maelkloud.com`
+- Hostname: `*.lbrightlab.com`
 - Includes all application certificates (keycloak, grafana, prometheus, loki, tempo)
 
 **Note**: This is optional. Each application currently uses its own Gateway resource, which is the recommended approach for better isolation and management.
@@ -66,7 +66,7 @@ A shared main gateway configuration is available in `platform/istio/main-gateway
 All certificates are managed by cert-manager:
 - **Issuer**: `letsencrypt-dns-cloudflare` (ClusterIssuer)
 - **Challenge**: DNS-01 using Cloudflare API token
-- **Domain**: `maelkloud.com` and subdomains
+- **Domain**: `lbrightlab.com` and subdomains
 
 Certificates are automatically issued and renewed by cert-manager using the Cloudflare API token secret stored in the `cert-manager` namespace.
 

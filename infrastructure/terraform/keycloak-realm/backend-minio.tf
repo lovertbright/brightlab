@@ -1,11 +1,11 @@
 terraform {
   backend "s3" {
-    bucket = "mkloudlab-bucket"
+    bucket = "lbrightlab-bucket"
     key    = "keycloak-realm/terraform.tfstate"
     region = "us-east-1"
 
     endpoints = {
-      s3 = "https://minio.maelkloud.com"
+      s3 = "https://minio.lbrightlab.com"
     }
 
     skip_credentials_validation = true
@@ -17,6 +17,6 @@ terraform {
     # Credentials - use environment variables for security:
     # export AWS_ACCESS_KEY_ID="terraform"
     # export AWS_SECRET_ACCESS_KEY="terraformS3cret2024MinIO"
-    # export AWS_ENDPOINT_URL_S3="https://minio.maelkloud.com"
+    # export AWS_ENDPOINT_URL_S3="https://minio.lbrightlab.com"
   }
 }

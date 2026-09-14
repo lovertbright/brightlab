@@ -37,7 +37,7 @@ prometheus.relabel "k8s_metrics" {
   // Add cluster label to all metrics
   rule {
     target_label = "cluster"
-    replacement  = "mkloudlab"
+    replacement  = "lbrightlab"
   }
 
   // Drop high-cardinality pod metrics (keep only aggregated metrics)
@@ -95,7 +95,7 @@ loki.write "k8s" {
     url = "http://loki.observability.svc.cluster.local:3100/loki/api/v1/push"
   }
   external_labels = {
-    cluster = "mkloudlab",
+    cluster = "lbrightlab",
   }
 }
 

@@ -12,7 +12,7 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: mkloudlab
+    name: lbrightlab
     namespace: flux-system
   targetNamespace: kyverno
   wait: true

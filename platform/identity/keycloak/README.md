@@ -101,7 +101,7 @@ kubectl logs -n keycloak keycloak-keycloak-keycloakx-0 -c keycloak
 
 ## Accessing Keycloak
 
-After deployment, Keycloak will be accessible at the hostname specified in `gateway.yaml` (e.g., `keycloak.mkloud.lab`).
+After deployment, Keycloak will be accessible at the hostname specified in `gateway.yaml` (e.g., `keycloak.lbrightlab.com`).
 
 ### Port-Forward for Local Access
 

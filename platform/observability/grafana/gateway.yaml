@@ -12,7 +12,7 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
-      hostname: grafana.maelkloud.com
+      hostname: grafana.lbrightlab.com
       tls:
         mode: Terminate
         certificateRefs:
@@ -30,7 +30,7 @@ spec:
       namespace: istio-system
       sectionName: https-grafana
   hostnames:
-    - grafana.maelkloud.com
+    - grafana.lbrightlab.com
   rules:
     - backendRefs:
         - name: grafana

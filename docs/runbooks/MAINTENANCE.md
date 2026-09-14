@@ -2,7 +2,7 @@
 
 ## 🔧 Maintenance Overview
 
-This runbook covers routine maintenance tasks for the Mkloudlab Kubernetes GitOps environment, including updates, backups, monitoring, and optimization.
+This runbook covers routine maintenance tasks for the Lbrightlab Kubernetes GitOps environment, including updates, backups, monitoring, and optimization.
 
 ## 📅 Maintenance Schedule
 
