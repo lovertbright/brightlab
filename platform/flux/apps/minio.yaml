@@ -12,6 +12,6 @@ spec:
   timeout: 10m
   sourceRef:
     kind: GitRepository
-    name: lbrightlab
+    name: brightlab
   dependsOn:
     - name: networking-config

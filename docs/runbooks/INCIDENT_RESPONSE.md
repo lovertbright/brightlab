@@ -41,8 +41,8 @@ kubectl top nodes
 # All application status
 task status
 
-# ArgoCD applications
-kubectl get applications -n argocd
+# Flux Kustomizations and HelmReleases
+kubectl get kustomizations,helmreleases -n flux-system
 
 # Pod status across all namespaces
 kubectl get pods --all-namespaces --field-selector=status.phase!=Running,status.phase!=Succeeded
@@ -158,10 +158,10 @@ kubectl scale deployment/<deployment-name> --replicas=1 -n <namespace>
 
 ```bash
 # 1. Check certificate status
-task certs:status
+task certificates:status
 
 # 2. Describe certificate issues
-task certs:describe
+task certificates:describe
 
 # 3. Check certificate requests
 kubectl get certificaterequests -A
@@ -191,46 +191,48 @@ kubectl get pods -n cert-manager
 kubectl get clusterissuers
 ```
 
-### Scenario 3: ArgoCD Sync Issues
+### Scenario 3: Flux Reconciliation Issues
 
 #### Symptoms
 
-- Applications out of sync
-- ArgoCD UI showing sync errors
-- GitOps not working
+- Kustomizations/HelmReleases stuck "Not Ready" or "Unknown"
+- `task flux:status` shows stale reconciliations
+- GitOps not applying changes pushed to the repo
 
 #### Immediate Actions
 
 ```bash
-# 1. Check ArgoCD applications
-kubectl get applications -n argocd
+# 1. Check Flux Kustomizations and HelmReleases
+task flux:status-all
 
-# 2. Check ArgoCD server logs
-kubectl logs -n argocd -l app.kubernetes.io/name=argocd-server
+# 2. Check Flux controller logs
+kubectl logs -n flux-system -l app=source-controller
+kubectl logs -n flux-system -l app=kustomize-controller
+kubectl logs -n flux-system -l app=helm-controller
 
-# 3. Force sync all applications
-task argocd:sync
+# 3. Force reconciliation of everything
+task flux:sync-all
 
-# 4. Check Git repository connectivity
-kubectl describe application <app-name> -n argocd
+# 4. Check GitRepository connectivity
+kubectl describe gitrepository brightlab -n flux-system
 ```
 
 #### Resolution Steps
 
-1. **Check Git connectivity** - verify repository access
+1. **Check Git connectivity** - verify the GitRepository can reach GitHub (DNS is a common culprit — see `task fix:dns`)
 2. **Validate manifests** - check for YAML syntax errors
-3. **Check permissions** - ensure ArgoCD has cluster access
-4. **Force sync** applications
-5. **Restart ArgoCD** if needed
+3. **Check permissions** - ensure Flux's service account has cluster access
+4. **Force reconciliation**
+5. **Restart Flux controllers** if needed
 
 #### Commands
 
 ```bash
-# Force sync specific application
-kubectl patch application <app-name> -n argocd --type merge -p '{"operation":{"sync":{"syncStrategy":{"hook":{"force":true}}}}}'
+# Force reconcile a specific Kustomization
+flux reconcile kustomization <name> -n flux-system --with-source
 
-# Restart ArgoCD server
-kubectl rollout restart deployment/argocd-server -n argocd
+# Restart Flux controllers
+kubectl rollout restart deployment -n flux-system
 ```
 
 ### Scenario 4: Network Connectivity Issues
@@ -396,15 +398,15 @@ kubectl scale deployment --replicas=0 -n <namespace>
 # Delete stuck pods
 kubectl delete pod <pod-name> -n <namespace> --force --grace-period=0
 
-# Clear ArgoCD cache
-kubectl delete secret -n argocd -l app.kubernetes.io/name=argocd-server
+# Force Flux to reconcile everything from Git right now
+task flux:sync-all
 ```
 
 ### Emergency Access
 
 ```bash
-# Get ArgoCD admin password
-kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 -d
+# Get Keycloak admin password
+kubectl get secret keycloak-admin -n keycloak -o jsonpath='{.data.password}' | base64 -d
 
 # Port forward to service
 kubectl port-forward svc/<service-name> -n <namespace> 8080:80

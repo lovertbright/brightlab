@@ -1,4 +1,4 @@
-# lbrightlab - Available Tasks
+# Brightlab - Available Tasks
 
 This file is auto-generated. Run `task docs` to update.
 

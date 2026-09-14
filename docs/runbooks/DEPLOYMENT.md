@@ -2,7 +2,7 @@
 
 ## 🚀 Deployment Overview
 
-This runbook covers the complete deployment process for the Lbrightlab Kubernetes GitOps environment, from initial setup to production deployment.
+This runbook covers the complete deployment process for the Brightlab Kubernetes GitOps environment, from initial setup to production deployment.
 
 ## 📋 Prerequisites Checklist
 
@@ -26,7 +26,7 @@ This runbook covers the complete deployment process for the Lbrightlab Kubernete
 
 - [ ] **Task** installed (`brew install go-task/tap/go-task`)
 - [ ] **kubectl** configured
-- [ ] **argocd CLI** (optional)
+- [ ] **flux CLI** (optional — `curl -s https://fluxcd.io/install.sh | sudo bash`)
 - [ ] **terraform** (for Keycloak setup)
 
 ## 🔧 Deployment Steps
@@ -49,27 +49,27 @@ kubectl get nodes -o wide
 kubectl get storageclass
 ```
 
-#### 1.2 Install ArgoCD
+#### 1.2 Install Flux
 
 ```bash
-# Install ArgoCD
-task install:argocd
+# Install Flux controllers
+task install:flux
 
-# Wait for ArgoCD to be ready
-kubectl wait --for=condition=available --timeout=300s deployment -n argocd -l app.kubernetes.io/name=argocd-server
+# Point Flux at this Git repository
+task flux:configure-repo
 
-# Verify ArgoCD installation
-kubectl get pods -n argocd
+# Verify Flux installation
+kubectl get pods -n flux-system
 ```
 
 #### 1.3 Deploy Applications
 
 ```bash
-# Deploy all ArgoCD applications independently
+# Register all Flux applications (Kustomizations/HelmReleases) — they sync automatically
 task install:apps
 
-# Monitor deployment progress
-watch kubectl get applications -n argocd
+# Monitor reconciliation progress
+watch task flux:status
 ```
 
 ### Phase 2: Core Services Deployment
@@ -80,8 +80,8 @@ watch kubectl get applications -n argocd
 # Check application status
 task status
 
-# Monitor specific applications
-kubectl get applications -n argocd -o wide
+# Monitor Flux Kustomizations and HelmReleases
+task flux:status-all
 
 # Check pod status
 kubectl get pods --all-namespaces
@@ -136,8 +136,8 @@ task gateway:status
 #### 4.1 Deploy Security Configurations
 
 ```bash
-# Deploy security configurations
-kubectl apply -f argocd/apps/security-config-app.yaml
+# Deploy security configurations (Flux Kustomization)
+kubectl apply -f platform/flux/apps/security-config.yaml
 
 # Verify security deployment
 task security:validate
@@ -193,10 +193,10 @@ kubectl logs -n logging -l app.kubernetes.io/name=promtail --tail=10
 
 ```bash
 # Check certificate status
-task certs:status
+task certificates:status
 
 # Describe certificate issues
-task certs:describe
+task certificates:describe
 
 # Check certificate requests
 kubectl get certificaterequests -A
@@ -287,7 +287,7 @@ task access
 task dns:check
 
 # Verify certificates
-task certs:status
+task certificates:status
 
 # Check Gateway API
 task gateway:status
@@ -309,28 +309,31 @@ kubectl get pv,pvc -A
 
 ## 🚨 Common Deployment Issues
 
-### Issue 1: ArgoCD Applications Not Syncing
+### Issue 1: Flux Not Reconciling
 
 #### Symptoms
 
-- Applications stuck in "OutOfSync" status
-- ArgoCD UI showing sync errors
+- Kustomizations or HelmReleases stuck in "Not Ready"
+- `task flux:status` shows stale or failed reconciliations
 
 #### Resolution
 
 ```bash
-# Check ArgoCD server logs
-kubectl logs -n argocd -l app.kubernetes.io/name=argocd-server
+# Check Flux controller logs
+kubectl logs -n flux-system -l app=source-controller
+kubectl logs -n flux-system -l app=kustomize-controller
 
-# Force sync all applications
-task argocd:sync
+# Force reconciliation of everything
+task flux:sync-all
 
-# Check Git repository connectivity
-kubectl describe application <app-name> -n argocd
+# Check GitRepository connectivity
+kubectl describe gitrepository brightlab -n flux-system
 
-# Restart ArgoCD server if needed
-kubectl rollout restart deployment/argocd-server -n argocd
+# Restart Flux controllers if needed
+kubectl rollout restart deployment -n flux-system
 ```
+
+If the GitRepository can't clone (DNS failures resolving `github.com`), see `task fix:dns` and [Troubleshooting Runbook](./TROUBLESHOOTING.md).
 
 ### Issue 2: Certificate Issues
 
@@ -430,7 +433,7 @@ watch kubectl get pods --all-namespaces
 watch kubectl top nodes
 
 # Application monitoring
-watch kubectl get applications -n argocd
+watch kubectl get kustomizations,helmreleases -n flux-system
 
 # Security monitoring
 watch kubectl get networkpolicies -A
@@ -444,12 +447,12 @@ watch kubectl get networkpolicies -A
 # Rollback specific application
 kubectl rollout undo deployment/<deployment-name> -n <namespace>
 
-# Rollback ArgoCD application
-kubectl patch application <app-name> -n argocd --type merge -p '{"operation":{"sync":{"revision":"<previous-revision>"}}}'
+# Rollback via Git (Flux reconciles from the branch Git state)
+git revert <bad-commit>   # or: git checkout <previous-commit> -- <path>
+git push
 
-# Rollback to previous Git commit
-git checkout <previous-commit>
-kubectl apply -f argocd/root-app.yaml
+# Force Flux to pick up the change immediately instead of waiting for the next poll
+task flux:sync-all
 ```
 
 ### Complete Rollback
@@ -477,8 +480,8 @@ task backup
 
 ### During Deployment
 
-- [ ] **ArgoCD installed**
-- [ ] **Root application deployed**
+- [ ] **Flux installed**
+- [ ] **GitRepository configured**
 - [ ] **Core services running**
 - [ ] **Applications deployed**
 - [ ] **Security configured**

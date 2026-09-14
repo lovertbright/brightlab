@@ -32,4 +32,4 @@ spec:
     domainFilters:
       - lbrightlab.com
     policy: sync
-    txtOwnerId: lbrightlab
+    txtOwnerId: brightlab

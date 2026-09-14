@@ -155,7 +155,7 @@ Current configuration:
 - **Sources**: service, ingress, istio-gateway, istio-virtualservice
 - **Domain Filter**: lbrightlab.com
 - **Policy**: sync (manages records automatically)
-- **TXT Owner ID**: lbrightlab
+- **TXT Owner ID**: brightlab
 
 ## Manual DNS Record Creation
 

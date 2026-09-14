@@ -3,7 +3,7 @@ version: '3'
 vars:
   FLUX_NAMESPACE: flux-system
   KUBECTL_TIMEOUT: 300s
-  PROJECT_NAME: lbrightlab
+  PROJECT_NAME: Brightlab
   GIT_REPO_URL: "https://github.com/lovertbright/brightlab.git"
 
 includes:
@@ -147,7 +147,7 @@ tasks:
       - echo "Configuring Flux GitRepository..."
       - kubectl apply -f platform/flux/manifests/git-repository.yaml
       - echo "Waiting for GitRepository to be ready..."
-      - kubectl wait --for=condition=ready --timeout=60s gitrepository/lbrightlab -n {{.FLUX_NAMESPACE}} || true
+      - kubectl wait --for=condition=ready --timeout=60s gitrepository/brightlab -n {{.FLUX_NAMESPACE}} || true
       - echo "✅ GitRepository configured"
 
   flux:sync-all:
@@ -156,7 +156,7 @@ tasks:
       - echo "Reconciling all Flux resources..."
       - |
         if command -v flux &> /dev/null; then
-          flux reconcile source git lbrightlab -n {{.FLUX_NAMESPACE}}
+          flux reconcile source git brightlab -n {{.FLUX_NAMESPACE}}
           for kustomization in $(kubectl get kustomizations -n {{.FLUX_NAMESPACE}} -o name 2>/dev/null); do
             echo "Reconciling $kustomization..."
             flux reconcile kustomization $(echo $kustomization | cut -d/ -f2) -n {{.FLUX_NAMESPACE}} || true

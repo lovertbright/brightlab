@@ -33,7 +33,7 @@ sleep 10
 
 if command -v flux &>/dev/null; then
   echo -e "${GREEN}[INFO]${NC} Triggering Flux to reconcile GitRepository (retry clone)..."
-  flux reconcile source git lbrightlab -n flux-system --timeout=2m || true
+  flux reconcile source git brightlab -n flux-system --timeout=2m || true
   echo -e "${GREEN}[INFO]${NC} Triggering Flux to reconcile all Kustomizations and HelmReleases..."
   for k in $(kubectl get kustomizations -n flux-system -o name 2>/dev/null | cut -d/ -f2); do flux reconcile kustomization "$k" -n flux-system --timeout=1m || true; done
   kubectl get helmreleases -A --no-headers 2>/dev/null | while read -r ns name rest; do flux reconcile helmrelease "$name" -n "$ns" --timeout=1m || true; done

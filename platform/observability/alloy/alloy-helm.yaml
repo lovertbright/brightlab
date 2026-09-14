@@ -81,7 +81,7 @@ spec:
             // Add cluster label to all metrics
             rule {
               target_label = "cluster"
-              replacement  = "lbrightlab"
+              replacement  = "brightlab"
             }
 
             // Drop high-cardinality pod metrics (keep only aggregated metrics)
@@ -139,7 +139,7 @@ spec:
               url = "http://loki.observability.svc.cluster.local:3100/loki/api/v1/push"
             }
             external_labels = {
-              cluster = "lbrightlab",
+              cluster = "brightlab",
             }
           }
 

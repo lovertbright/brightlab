@@ -46,7 +46,7 @@ kubectl get namespaces -o custom-columns=NAME:.metadata.name,PSS-ENFORCE:.metada
 task secrets:status
 
 # Check certificate status
-task certs:status
+task certificates:status
 
 # Check for suspicious pods
 kubectl get pods --all-namespaces -o wide
@@ -105,7 +105,7 @@ kubectl delete serviceaccount <suspicious-sa> -n <namespace>
 kubectl delete rolebinding <suspicious-binding> -n <namespace>
 
 # Apply stricter network policies
-kubectl apply -f security/network-policies.yaml
+kubectl apply -f platform/security/network-policies.yaml
 ```
 
 #### Investigation Steps
@@ -159,7 +159,7 @@ kubectl delete pod <suspicious-pod> -n <namespace> --force --grace-period=0
 kubectl create configmap blocked-images -n kyverno --from-literal=images="malicious-image:latest"
 
 # Apply image validation policy
-kubectl apply -f kyverno/policies/clusterpolicy.yaml
+kubectl apply -f platform/kyverno/policies/clusterpolicy.yaml
 ```
 
 #### Investigation Steps
@@ -207,7 +207,7 @@ kubectl get gateways,httproutes -A
 
 ```bash
 # Apply stricter network policies
-kubectl apply -f security/network-policies.yaml
+kubectl apply -f platform/security/network-policies.yaml
 
 # Block suspicious IPs
 kubectl create configmap blocked-ips -n kyverno --from-literal=ips="suspicious-ip"
@@ -284,7 +284,7 @@ kubectl patch deployment <deployment> -n <namespace> -p '{"spec":{"template":{"s
 kubectl label namespace <namespace> pod-security.kubernetes.io/enforce=restricted
 
 # Apply Kyverno policies
-kubectl apply -f kyverno/policies/clusterpolicy.yaml
+kubectl apply -f platform/kyverno/policies/clusterpolicy.yaml
 ```
 
 #### Investigation Steps
@@ -350,7 +350,7 @@ kubectl get ingress -A -o yaml > evidence/$(date +%Y%m%d-%H%M%S)/ingress.yaml
 kubectl scale deployment <affected-deployment> --replicas=0 -n <namespace>
 
 # Apply emergency network policies
-kubectl apply -f security/network-policies.yaml
+kubectl apply -f platform/security/network-policies.yaml
 
 # Revoke suspicious access
 kubectl delete rolebinding <suspicious-binding> -n <namespace>
@@ -372,7 +372,7 @@ kubectl rollout restart statefulset/tempo-ingester -n observability
 kubectl get pods --all-namespaces
 
 # Apply security policies
-kubectl apply -f security/
+kubectl apply -f platform/security/
 
 # Verify security status
 task security:scan
@@ -382,7 +382,7 @@ task security:scan
 
 ```bash
 # Restore legitimate access
-kubectl apply -f security/rbac-policies.yaml
+kubectl apply -f platform/security/rbac-policies.yaml
 
 # Verify RBAC
 kubectl get roles,clusterroles,rolebindings,clusterrolebindings -A

@@ -1,6 +1,6 @@
-# Lbrightlab - Kubernetes GitOps Repository
+# Brightlab - Kubernetes GitOps Repository
 
-Lbrightlab is a production-grade Kubernetes platform managed via GitOps (Flux CD). It bundles infrastructure provisioning, platform services, and observability into a single, automated repository.
+Brightlab is a production-grade Kubernetes platform managed via GitOps (Flux CD). It bundles infrastructure provisioning, platform services, and observability into a single, automated repository.
 
 All services are exposed under **`lbrightlab.com`** (e.g. `grafana.lbrightlab.com`, `keycloak.lbrightlab.com`) via Cloudflare DNS + Istio Gateway API. If you're forking this repo for your own domain, see [Configuring your own domain](#-configuring-your-own-domain) before you deploy.
 
@@ -21,7 +21,7 @@ From the repo root, run:
 task deploy:local
 ```
 
-This guides you through: checking prerequisites → bringing up the Vagrant cluster → installing prerequisites → (optional) Cloudflare token → Flux → deploying apps. You can also use **step-by-step mode**:
+This guides you through: checking prerequisites → bringing up the Vagrant cluster → fixing cluster DNS → installing prerequisites → (optional) Cloudflare token → Flux → deploying apps. You can also use **step-by-step mode**:
 
 ```bash
 task deploy:menu
@@ -53,7 +53,13 @@ task vagrant:up WORKER_COUNT=3
 task scale COUNT=1
 ```
 
-### 3. Cluster Bootstrap
+### 3. Fix cluster DNS
+On a fresh Vagrant cluster, CoreDNS often can't resolve external hosts (e.g. `github.com`), which later makes Flux fail to clone this repo. Patch it now to avoid that:
+```bash
+task fix:dns
+```
+
+### 4. Cluster Bootstrap
 Install essential cluster components (Gateway API, Storage, Cert-Manager) and set up secrets.
 ```bash
 # 1. Install Prerequisites
@@ -66,7 +72,7 @@ export CLOUDFLARE_API_TOKEN=your_token
 task certificates:configure-token
 ```
 
-### 4. GitOps Deployment (Flux)
+### 5. GitOps Deployment (Flux)
 Deploy the platform and applications using Flux.
 ```bash
 # 1. Install Flux controllers
@@ -85,7 +91,7 @@ task flux:status
 flux get all -n flux-system
 ```
 
-### 5. Post-Installation
+### 6. Post-Installation
 Configure sensitive resources that are not in Git.
 - **Keycloak & Secrets**: See `infrastructure/terraform/keycloak-realm`.
 
@@ -98,14 +104,15 @@ This repo ships pre-configured for `lbrightlab.com`. To point it at your own dom
 | What | File | Setting |
 | --- | --- | --- |
 | Service hostnames | `platform/istio/httproutes.yaml`, `platform/*/gateway.yaml`, `platform/*/certificate.yaml` | Replace `*.lbrightlab.com` with `*.yourdomain.com` |
-| External-DNS zone filter | `platform/networking/external-dns/helmrelease.yaml` | `domainFilters` and `txtOwnerId` |
+| External-DNS zone filter | `platform/networking/external-dns/helmrelease.yaml` | `domainFilters` |
 | ACME (Let's Encrypt) contact email | `platform/cert-manager/cluster-issuer.yaml` | `spec.acme.email` |
 | Keycloak realm defaults | `infrastructure/terraform/keycloak-realm/variable.tf` | `kc_url` default |
-| Flux GitRepository source | `platform/flux/manifests/git-repository.yaml`, `Taskfile.yml` (`GIT_REPO_URL`) | Point at your fork's URL |
 
-A quick way to find every occurrence: `grep -rl "lbrightlab" --exclude-dir=.git .`
+Find every domain reference with: `grep -rl "lbrightlab.com" --exclude-dir=.git .`
 
-You'll also need your domain's zone added to Cloudflare (for DNS-01 cert validation and External-DNS record management) before step 3 above.
+You'll also need your domain's zone added to Cloudflare (for DNS-01 cert validation and External-DNS record management) before step 4 above.
+
+The project name itself (`Brightlab` / `PROJECT_NAME` / `txtOwnerId` / the Flux `GitRepository` resource name, and the clone URL in `Taskfile.yml`'s `GIT_REPO_URL`) is separate from the domain — rename those too if you're also forking the repo under a different name, e.g. with `grep -rl "[Bb]rightlab" --exclude-dir=.git .`
 
 ---
 

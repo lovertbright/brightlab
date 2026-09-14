@@ -2,7 +2,7 @@
 
 ## 🔧 Maintenance Overview
 
-This runbook covers routine maintenance tasks for the Lbrightlab Kubernetes GitOps environment, including updates, backups, monitoring, and optimization.
+This runbook covers routine maintenance tasks for the Brightlab Kubernetes GitOps environment, including updates, backups, monitoring, and optimization.
 
 ## 📅 Maintenance Schedule
 
@@ -11,7 +11,7 @@ This runbook covers routine maintenance tasks for the Lbrightlab Kubernetes GitO
 - [ ] **Health check**: `task health`
 - [ ] **Application status**: `task status`
 - [ ] **Security scan**: `task security:scan`
-- [ ] **Certificate status**: `task certs:status`
+- [ ] **Certificate status**: `task certificates:status`
 
 ### Weekly Tasks
 
@@ -38,33 +38,32 @@ This runbook covers routine maintenance tasks for the Lbrightlab Kubernetes GitO
 
 ### Application Updates
 
-#### 1. ArgoCD Updates
+#### 1. Flux Updates
 
 ```bash
-# Check current ArgoCD version
-kubectl get deployment argocd-server -n argocd -o jsonpath='{.spec.template.spec.containers[0].image}'
+# Check current Flux CLI and controller versions
+flux version
 
-# Update ArgoCD (modify argocd/manifests/argocd-values.yaml)
-# Change the image tag to new version
-
-# Apply update
-kubectl apply -n argocd -f argocd/manifests/argocd-values.yaml
+# Update the Flux CLI, then re-apply to upgrade the in-cluster controllers
+curl -s https://fluxcd.io/install.sh | sudo bash
+task install:flux
 
 # Verify update
-kubectl rollout status deployment/argocd-server -n argocd
+kubectl get pods -n flux-system
+flux version
 ```
 
 #### 2. Application Updates
 
 ```bash
-# Update application manifests in Git
-# ArgoCD will automatically sync changes
+# Update application manifests in Git and push
+# Flux polls the repo (interval: 1m) and syncs automatically
 
-# Force sync if needed
-task argocd:sync
+# Force reconciliation immediately instead of waiting
+task flux:sync-all
 
 # Monitor update progress
-watch kubectl get applications -n argocd
+task flux:status-all
 ```
 
 #### 3. Base Image Updates
@@ -114,9 +113,9 @@ kubectl rollout status deployment/tempo-query-frontend -n observability
 # Review current PSS configuration
 kubectl get namespaces -o custom-columns=NAME:.metadata.name,PSS-ENFORCE:.metadata.labels.pod-security\.kubernetes\.io/enforce
 
-# Update PSS in security/namespace-security.yaml
+# Update PSS in platform/security/namespace-security.yaml
 # Apply changes
-kubectl apply -f security/namespace-security.yaml
+kubectl apply -f platform/security/namespace-security.yaml
 ```
 
 #### 2. Network Policy Updates
@@ -125,9 +124,9 @@ kubectl apply -f security/namespace-security.yaml
 # Review current network policies
 kubectl get networkpolicies -A
 
-# Update policies in security/network-policies.yaml
+# Update policies in platform/security/network-policies.yaml
 # Apply changes
-kubectl apply -f security/network-policies.yaml
+kubectl apply -f platform/security/network-policies.yaml
 ```
 
 #### 3. RBAC Updates
@@ -136,9 +135,9 @@ kubectl apply -f security/network-policies.yaml
 # Review current RBAC
 kubectl get roles,clusterroles,rolebindings,clusterrolebindings -A
 
-# Update RBAC in security/rbac-policies.yaml
+# Update RBAC in platform/security/rbac-policies.yaml
 # Apply changes
-kubectl apply -f security/rbac-policies.yaml
+kubectl apply -f platform/security/rbac-policies.yaml
 ```
 
 ## 💾 Backup Procedures
@@ -162,15 +161,17 @@ kubectl get secrets -A -o yaml > backups/$(date +%Y%m%d-%H%M%S)/secrets.yaml
 kubectl get configmaps -A -o yaml > backups/$(date +%Y%m%d-%H%M%S)/configmaps.yaml
 ```
 
-### 2. ArgoCD Backup
+### 2. Flux State Backup
 
 ```bash
-# Backup ArgoCD applications
-kubectl get applications -n argocd -o yaml > backups/$(date +%Y%m%d-%H%M%S)/argocd-applications.yaml
+# Backup Flux Kustomizations and HelmReleases
+kubectl get kustomizations,helmreleases -n flux-system -o yaml > backups/$(date +%Y%m%d-%H%M%S)/flux-state.yaml
 
-# Backup ArgoCD configuration
-kubectl get configmap argocd-cmd-params-cm -n argocd -o yaml > backups/$(date +%Y%m%d-%H%M%S)/argocd-config.yaml
+# Backup the GitRepository source definition
+kubectl get gitrepository brightlab -n flux-system -o yaml > backups/$(date +%Y%m%d-%H%M%S)/flux-gitrepository.yaml
 ```
+
+Since this is GitOps, the Git history in `platform/flux/` is the primary source of truth — the commands above are a convenience snapshot of live cluster state, not a substitute for the Git backup below.
 
 ### 4. Git Repository Backup
 
@@ -277,7 +278,7 @@ kubectl get networkpolicies -A
 kubectl get endpoints -A
 
 # Optimize network policies
-kubectl apply -f security/network-policies.yaml
+kubectl apply -f platform/security/network-policies.yaml
 ```
 
 ## 🛡️ Security Maintenance
@@ -299,7 +300,7 @@ task secrets:status
 
 ```bash
 # Check certificate status
-task certs:status
+task certificates:status
 
 # Check certificate expiration
 kubectl get certificates -A -o custom-columns=NAME:.metadata.name,NAMESPACE:.metadata.namespace,READY:.status.conditions[0].status,EXPIRY:.status.notAfter
@@ -449,7 +450,8 @@ kubectl scale deployment/<deployment-name> --replicas=1 -n <namespace>
 ```bash
 # Restore from Git backup
 git checkout <backup-commit>
-kubectl apply -f argocd/root-app.yaml
+git push   # Flux reconciles from the branch tip
+task flux:sync-all
 ```
 
 ### 3. Cluster Recovery

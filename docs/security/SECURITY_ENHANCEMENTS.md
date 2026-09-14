@@ -1,6 +1,6 @@
 # Security Enhancements Documentation
 
-This document outlines the security improvements implemented in the Lbrightlab Kubernetes GitOps repository.
+This document outlines the security improvements implemented in the Brightlab Kubernetes GitOps repository.
 
 ## 🔒 Security Features Implemented
 

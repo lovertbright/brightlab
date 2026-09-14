@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "lbrightlab-bucket"
+    bucket = "brightlab-bucket"
     key    = "keycloak-realm/terraform.tfstate"
     region = "us-east-1"
 

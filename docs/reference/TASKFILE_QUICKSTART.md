@@ -1,4 +1,4 @@
-# Lbrightlab Taskfile Quick Start Guide
+# Brightlab Taskfile Quick Start Guide
 
 This guide helps you get started with the Taskfile automation for your Kubernetes GitOps repository.
 
@@ -16,7 +16,7 @@ This guide helps you get started with the Taskfile automation for your Kubernete
 
 2. **Required Tools**:
    - `kubectl` - Kubernetes CLI
-   - `argocd` - ArgoCD CLI (optional, for advanced operations)
+   - `flux` - Flux CLI (optional — installed automatically by `task install:flux` if missing)
    - `terraform` - For Keycloak configuration
    - `vagrant` - For local cluster provisioning
    - `yamllint` - For YAML validation
@@ -40,17 +40,20 @@ task status
 task validate:cluster
 ```
 
-### ArgoCD Operations
+### Flux Operations
 
 ```bash
-# Show ArgoCD access info and status
-task argocd:ui
+# Show Flux status
+task flux:status
 
-# Sync all applications
-task argocd:sync
+# Show detailed status (sources, Kustomizations, HelmReleases across namespaces)
+task flux:status-all
 
-# Login to ArgoCD CLI
-task argocd:login
+# Force reconcile all Flux resources
+task flux:sync-all
+
+# Re-apply the GitRepository pointing Flux at this repo
+task flux:configure-repo
 ```
 
 ### Development & Maintenance
@@ -66,7 +69,7 @@ task format
 task health
 
 # Check certificate status
-task certs:status
+task certificates:status
 
 # Check Gateway API resources
 task gateway:status
@@ -173,8 +176,9 @@ task format
 # Lint YAML
 task lint
 
-# Sync changes via ArgoCD
-task argocd:sync
+# Push changes and let Flux pick them up (or force it immediately)
+task gitops:push
+task flux:sync-all
 ```
 
 ### 3. Troubleshooting
@@ -184,8 +188,8 @@ task argocd:sync
 task health
 
 # Check certificate issues
-task certs:status
-task certs:describe
+task certificates:status
+task certificates:describe
 
 # Check Gateway API resources
 task gateway:status
@@ -216,10 +220,10 @@ kubectl get pods -n observability -l app.kubernetes.io/name=tempo
 
 ```bash
 # After deployment, check certificate status
-task certs:status
+task certificates:status
 
 # If certificates are not ready, check issues
-task certs:describe
+task certificates:describe
 
 # Verify DNS resolution
 task dns:check
@@ -250,7 +254,20 @@ task install
 
 ## Service Access URLs
 
-# OpenTelemetry Quick Start
+Access services via your `lbrightlab.com` domain:
+
+```bash
+# Show all service URLs and their status
+task access
+
+# Direct URLs (once deployed and certificates are ready):
+# Grafana:    https://grafana.lbrightlab.com
+# Keycloak:   https://keycloak.lbrightlab.com
+# Prometheus: https://prometheus.lbrightlab.com
+# MinIO:      https://minio.lbrightlab.com
+```
+
+### OpenTelemetry Quick Start
 
 ```bash
 # Point your workloads to Alloy's OTLP gateway
@@ -262,18 +279,6 @@ export OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=grpc://alloy-gateway.observability:431
 # Tempo endpoints (direct access, if required)
 export TEMPO_OTLP_GRPC_ENDPOINT=tempo-tempo-distributor.observability.svc.cluster.local:4317
 export TEMPO_OTLP_HTTP_ENDPOINT=http://tempo-tempo-distributor.observability.svc.cluster.local:4318
-```
-
-Access services via your lbrightlab.com domain:
-
-```bash
-# Show all service URLs and their status
-task access
-
-# Direct URLs (once deployed and certificates are ready):
-# ArgoCD:    https://argocd.lbrightlab.com
-# Grafana:   https://grafana.lbrightlab.com
-# Keycloak:  https://keycloak.lbrightlab.com
 ```
 
 ## Cleanup Operations
@@ -347,18 +352,17 @@ task vagrant:restart
 
 ## Environment Variables
 
-You can override default settings:
+Taskfile variables (defined in the `vars:` block at the top of `Taskfile.yml`) are overridden as CLI arguments, not shell `export`s:
 
 ```bash
-# Change ArgoCD namespace
-export ARGOCD_NAMESPACE=my-argocd
+# Change the Flux namespace
+task install:flux FLUX_NAMESPACE=custom-flux-system
 
-# Extend kubectl timeout
-export KUBECTL_TIMEOUT=600s
-
-# Run tasks with custom vars
-task install ARGOCD_NAMESPACE=custom-argocd
+# Extend the kubectl wait timeout
+task install:flux KUBECTL_TIMEOUT=600s
 ```
+
+Actual shell environment variables — like `CLOUDFLARE_API_TOKEN` used in [Cluster Bootstrap](../../README.md#4-cluster-bootstrap) — are still set the normal way with `export`.
 
 ## Getting Help
 
@@ -369,4 +373,4 @@ task install ARGOCD_NAMESPACE=custom-argocd
 - Each task includes a description of what it does
 - Use `task --list-all` to see all tasks including subtasks
 
-For more details, see the main [README.md](./README.md) and individual component documentation.
+For more details, see the main [README.md](../../README.md) and individual component documentation.

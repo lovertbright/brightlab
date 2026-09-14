@@ -1,6 +1,6 @@
 # Scripts Directory
 
-This directory contains utility scripts for managing and troubleshooting the lbrightlab Kubernetes cluster.
+This directory contains utility scripts for managing and troubleshooting the Brightlab Kubernetes cluster.
 
 ## Setup & Installation Scripts
 

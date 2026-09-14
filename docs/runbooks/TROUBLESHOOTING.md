@@ -108,7 +108,7 @@ kubectl describe storageclass <storage-class-name>
 
 #### Symptoms
 
-- `gitrepository/lbrightlab` shows: `failed to checkout and determine revision: unable to clone ... dial tcp: lookup github.com on 10.96.0.10:53: server misbehaving`
+- `gitrepository/brightlab` shows: `failed to checkout and determine revision: unable to clone ... dial tcp: lookup github.com on 10.96.0.10:53: server misbehaving`
 - Kustomizations show: `Source artifact not found, retrying in 30s`
 
 #### Cause
@@ -122,7 +122,7 @@ Patch CoreDNS to use reliable upstream DNS, then restart Flux reconciliation:
 ```bash
 task fix:dns
 # Wait for CoreDNS rollout, then trigger Flux to retry
-flux reconcile source git lbrightlab -n flux-system
+flux reconcile source git brightlab -n flux-system
 task flux:status
 ```
 
@@ -207,10 +207,10 @@ kubectl delete networkpolicy <policy-name> -n <namespace>
 
 ```bash
 # 1. Check certificate status
-task certs:status
+task certificates:status
 
 # 2. Describe certificate issues
-task certs:describe
+task certificates:describe
 
 # 3. Check certificate requests
 kubectl get certificaterequests -A
@@ -270,31 +270,29 @@ spec:
 EOF
 ```
 
-### Issue 4: ArgoCD Sync Issues
+### Issue 4: Flux Sync Issues
 
 #### Symptoms
 
-- Applications out of sync
-- ArgoCD UI showing errors
+- Kustomizations/HelmReleases out of sync or "Not Ready"
+- `task flux:status` showing errors
 - GitOps not working
 
 #### Investigation Steps
 
 ```bash
-# 1. Check ArgoCD applications
-kubectl get applications -n argocd
+# 1. Check Flux Kustomizations and HelmReleases
+task flux:status-all
 
-# 2. Check ArgoCD server logs
-kubectl logs -n argocd -l app.kubernetes.io/name=argocd-server
+# 2. Check Flux controller logs
+kubectl logs -n flux-system -l app=kustomize-controller
+kubectl logs -n flux-system -l app=source-controller
 
-# 3. Check Git repository connectivity
-kubectl describe application <app-name> -n argocd
+# 3. Check GitRepository connectivity
+kubectl describe gitrepository brightlab -n flux-system
 
-# 4. Check ArgoCD server status
-kubectl get pods -n argocd
-
-# 5. Check ArgoCD configuration
-kubectl get configmap argocd-cmd-params-cm -n argocd
+# 4. Check Flux controller status
+kubectl get pods -n flux-system
 ```
 
 #### Common Causes & Solutions
@@ -302,17 +300,18 @@ kubectl get configmap argocd-cmd-params-cm -n argocd
 **Git Repository Issues**
 
 ```bash
-# Check Git repository access
-kubectl exec -it <argocd-server-pod> -n argocd -- git ls-remote <repo-url>
+# Check the GitRepository's reported error
+kubectl get gitrepository brightlab -n flux-system -o jsonpath='{.status.conditions}'
 
-# Solution: Fix repository access or credentials
+# Solution: fix connectivity (often DNS — see task fix:dns) or repo access/branch in
+# platform/flux/manifests/git-repository.yaml
 ```
 
 **Manifest Validation Issues**
 
 ```bash
-# Check manifest validation
-kubectl get applications <app-name> -n argocd -o yaml | grep -A 10 status
+# Check a Kustomization's reported error
+kubectl describe kustomization <name> -n flux-system
 
 # Solution: Fix YAML syntax errors
 task validate:manifests
@@ -321,8 +320,8 @@ task validate:manifests
 **Permission Issues**
 
 ```bash
-# Check ArgoCD service account permissions
-kubectl auth can-i get pods --as=system:serviceaccount:argocd:argocd-application-controller
+# Check Flux's service account permissions
+kubectl auth can-i get pods --as=system:serviceaccount:flux-system:kustomize-controller
 
 # Solution: Fix RBAC permissions
 ```
@@ -492,17 +491,17 @@ kubectl logs -n kube-system -l app=flannel
 kubectl logs -n kube-system -l app=local-path-provisioner
 ```
 
-### ArgoCD Logs
+### Flux Logs
 
 ```bash
-# ArgoCD server logs
-kubectl logs -n argocd -l app.kubernetes.io/name=argocd-server
+# Source controller logs (Git/Helm repository fetches)
+kubectl logs -n flux-system -l app=source-controller
 
-# ArgoCD application controller logs
-kubectl logs -n argocd -l app.kubernetes.io/name=argocd-application-controller
+# Kustomize controller logs (applying manifests)
+kubectl logs -n flux-system -l app=kustomize-controller
 
-# ArgoCD repo server logs
-kubectl logs -n argocd -l app.kubernetes.io/name=argocd-repo-server
+# Helm controller logs (HelmReleases)
+kubectl logs -n flux-system -l app=helm-controller
 ```
 
 ## 🛠 Recovery Procedures
@@ -535,14 +534,11 @@ kubectl get endpoints -n <namespace>
 ### Application Recovery
 
 ```bash
-# Force ArgoCD sync
-task argocd:sync
+# Force Flux to reconcile everything from Git
+task flux:sync-all
 
-# Restart ArgoCD server
-kubectl rollout restart deployment/argocd-server -n argocd
-
-# Clear ArgoCD cache
-kubectl delete secret -n argocd -l app.kubernetes.io/name=argocd-server
+# Restart Flux controllers
+kubectl rollout restart deployment -n flux-system
 ```
 
 ### Cluster Recovery

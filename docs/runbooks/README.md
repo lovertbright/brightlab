@@ -2,7 +2,7 @@
 
 ## 📚 Overview
 
-This directory contains comprehensive runbooks for operating the Lbrightlab Kubernetes GitOps environment. Each runbook provides detailed procedures for specific operational scenarios.
+This directory contains comprehensive runbooks for operating the Brightlab Kubernetes GitOps environment. Each runbook provides detailed procedures for specific operational scenarios.
 
 ## 📖 Available Runbooks
 
@@ -136,11 +136,11 @@ kubectl rollout restart deployment -n <namespace>
 # Scale down all deployments
 kubectl scale deployment --replicas=0 -n <namespace>
 
-# Force ArgoCD sync
-task argocd:sync
+# Force Flux to reconcile everything
+task flux:sync-all
 
-# Get ArgoCD admin password
-kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 -d
+# Get Keycloak admin password
+kubectl get secret keycloak-admin -n keycloak -o jsonpath='{.data.password}' | base64 -d
 ```
 
 ### Diagnostic Commands
@@ -157,7 +157,7 @@ kubectl top pods --all-namespaces
 kubectl get networkpolicies -A
 
 # Check certificates
-task certs:status
+task certificates:status
 ```
 
 ## 📞 Emergency Contacts
@@ -206,14 +206,14 @@ task certs:status
 - [Main README](../README.md) - Project overview and setup
 - [Taskfile Quick Start](../reference/TASKFILE_QUICKSTART.md) - Automation guide
 - [Security Enhancements](../security/SECURITY_ENHANCEMENTS.md) - Security features
-- [Deployment Guide](../README.md#automated-deployment-with-argocd) - Deployment instructions
+- [Deployment Runbook](./DEPLOYMENT.md) - Deployment instructions
 
 ## 📚 Additional Resources
 
 ### External Documentation
 
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
-- [ArgoCD Documentation](https://argo-cd.readthedocs.io/)
+- [Flux CD Documentation](https://fluxcd.io/flux/)
 - [Prometheus Documentation](https://prometheus.io/docs/)
 - [Grafana Documentation](https://grafana.com/docs/)
 

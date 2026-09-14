@@ -2,7 +2,7 @@
 
 ## Summary
 
-The lbrightlab Kubernetes cluster uses **Cloudflare DNS + MetalLB + Istio Gateway API** for service access:
+The Brightlab Kubernetes cluster uses **Cloudflare DNS + MetalLB + Istio Gateway API** for service access:
 - **Domain-based Access**: All services accessible via `*.lbrightlab.com` subdomains
 - **TLS Everywhere**: cert-manager with Let's Encrypt via Cloudflare DNS-01
 - **HTTP to HTTPS Redirect**: Automatic for all domains

@@ -9,7 +9,7 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: lbrightlab
+    name: brightlab
     namespace: flux-system
   targetNamespace: observability
   wait: false

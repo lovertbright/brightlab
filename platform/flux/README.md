@@ -64,7 +64,7 @@ flux get all -n flux-system
 ```bash
 task flux:sync-all
 # Or manually:
-flux reconcile source git lbrightlab -n flux-system
+flux reconcile source git brightlab -n flux-system
 flux reconcile kustomization <name> -n flux-system
 flux reconcile helmrelease <name> -n flux-system
 ```
@@ -92,8 +92,8 @@ kubectl logs -n flux-system -l app.kubernetes.io/name=helm-controller
 
 ### Check GitRepository Status
 ```bash
-kubectl get gitrepository lbrightlab -n flux-system
-kubectl describe gitrepository lbrightlab -n flux-system
+kubectl get gitrepository brightlab -n flux-system
+kubectl describe gitrepository brightlab -n flux-system
 ```
 
 ### Check Kustomization Status

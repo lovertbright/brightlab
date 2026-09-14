@@ -19,7 +19,7 @@ variable "kc_url" {
 variable "realm_name" {
   description = "Name of the Keycloak realm"
   type        = string
-  default     = "lbrightlab"
+  default     = "brightlab"
 }
 
 variable "create_realm" {

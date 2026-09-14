@@ -4,7 +4,7 @@ terraform {
   # to properly secure your state file and enable locking.
   #
   # backend "s3" {
-  #   bucket = "lbrightlab"
+  #   bucket = "brightlab"
   #   key    = "keycloak/terraform.tfstate"
   #   region = "us-east-1"
   # }
@@ -29,7 +29,7 @@ resource "keycloak_realm" "main" {
   count        = var.create_realm ? 1 : 0
   realm        = var.realm_name
   enabled      = true
-  display_name = "Lbrightlab Realm"
+  display_name = "Brightlab Realm"
 
   login_with_email_allowed = true
   duplicate_emails_allowed = false
@@ -55,7 +55,7 @@ locals {
 
 resource "keycloak_group" "admin_group" {
   realm_id = local.realm_id
-  name     = "lbrightlab-admins"
+  name     = "brightlab-admins"
 }
 
 locals {
