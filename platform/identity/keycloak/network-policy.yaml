@@ -110,7 +110,7 @@ spec:
               kubernetes.io/metadata.name: istio-system
           podSelector:
             matchLabels:
-              istio.io/gateway-name: main-gateway
+              gateway.networking.k8s.io/gateway-name: main-gateway
       ports:
         - protocol: TCP
           port: 8080

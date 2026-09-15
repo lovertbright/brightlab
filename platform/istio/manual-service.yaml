@@ -6,11 +6,11 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/hostname: "*.lbrightlab.com"
   labels:
-    istio.io/gateway-name: main-gateway
+    gateway.networking.k8s.io/gateway-name: main-gateway
 spec:
   type: LoadBalancer
   selector:
-    istio.io/gateway-name: main-gateway
+    gateway.networking.k8s.io/gateway-name: main-gateway
   ports:
     - name: http
       port: 80
