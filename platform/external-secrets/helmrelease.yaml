@@ -27,15 +27,16 @@ spec:
   values:
     installCRDs: true
 
-    # Security context
-    securityContext:
+    # Security context (chart uses podSecurityContext for pod-level fields like
+    # fsGroup, and securityContext for container-level fields)
+    podSecurityContext:
       runAsNonRoot: true
       runAsUser: 65534
       fsGroup: 65534
       seccompProfile:
         type: RuntimeDefault
 
-    containerSecurityContext:
+    securityContext:
       allowPrivilegeEscalation: false
       readOnlyRootFilesystem: true
       runAsNonRoot: true
@@ -64,14 +65,14 @@ spec:
           issuerRef:
             kind: ClusterIssuer
             name: self-signed
-      securityContext:
+      podSecurityContext:
         runAsNonRoot: true
         runAsUser: 65534
         fsGroup: 65534
         seccompProfile:
           type: RuntimeDefault
 
-      containerSecurityContext:
+      securityContext:
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
         runAsNonRoot: true
