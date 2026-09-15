@@ -22,7 +22,7 @@ spec:
         enabled: true
         storageClass: local-path
         size: 10Gi
-      podSecurityContext:
+      securityContext:
         fsGroup: 10001
         runAsUser: 10001
         runAsNonRoot: true

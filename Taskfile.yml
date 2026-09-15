@@ -98,6 +98,7 @@ tasks:
       - kubectl apply -f platform/flux/apps/cluster-config.yaml
       - echo "Networking layer..."
       - kubectl apply -f platform/flux/apps/networking.yaml
+      - kubectl apply -f platform/flux/apps/networking-config.yaml
       - kubectl apply -f platform/flux/apps/istio.yaml
       - kubectl apply -f platform/flux/apps/istio-config.yaml
       - echo "Application layer..."

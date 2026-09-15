@@ -92,8 +92,8 @@ spec:
       - "--cache=local"
       - "--proxy=edge"
 
-    # Security Context - Pod Level
-    securityContext:
+    # Security Context - Pod Level (chart key: podSecurityContext)
+    podSecurityContext:
       runAsNonRoot: true
       runAsUser: 1000
       runAsGroup: 1000
@@ -101,8 +101,8 @@ spec:
       seccompProfile:
         type: RuntimeDefault
 
-    # Security Context - Container Level
-    containerSecurityContext:
+    # Security Context - Container Level (chart key: securityContext)
+    securityContext:
       allowPrivilegeEscalation: false
       runAsNonRoot: true
       runAsUser: 1000
