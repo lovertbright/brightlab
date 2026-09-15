@@ -4,7 +4,7 @@ vars:
   FLUX_NAMESPACE: flux-system
   KUBECTL_TIMEOUT: 300s
   PROJECT_NAME: Brightlab
-  GIT_REPO_URL: "https://github.com/xmaeltht/mkloudlab.git"
+  GIT_REPO_URL: "https://github.com/lovertbright/brightlab.git"
 
 includes:
   terraform:
