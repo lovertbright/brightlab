@@ -23,15 +23,21 @@ CM=$(kubectl get configmap coredns -n kube-system -o yaml)
 if echo "$CM" | grep -q '/etc/resolv.conf'; then
   echo "$CM" | sed "s|forward \. /etc/resolv\.conf|forward . $UPSTREAM_DNS|" | kubectl apply -f -
 fi
-echo -e "${GREEN}[INFO]${NC} Restarting CoreDNS and Flux source-controller so pods use current DNS..."
+echo -e "${GREEN}[INFO]${NC} Restarting CoreDNS so pods use current DNS..."
 kubectl rollout restart deployment coredns -n kube-system
 kubectl rollout status deployment coredns -n kube-system --timeout=120s
-kubectl rollout restart deployment source-controller -n flux-system
-kubectl rollout status deployment source-controller -n flux-system --timeout=120s
+
+if kubectl get namespace flux-system &>/dev/null; then
+  echo -e "${GREEN}[INFO]${NC} Restarting Flux source-controller so it uses current DNS..."
+  kubectl rollout restart deployment source-controller -n flux-system
+  kubectl rollout status deployment source-controller -n flux-system --timeout=120s
+else
+  echo -e "${YELLOW}[WARN]${NC} flux-system namespace not found yet (Flux not installed). Skipping source-controller restart."
+fi
 echo -e "${GREEN}[INFO]${NC} Waiting for DNS to be ready..."
 sleep 10
 
-if command -v flux &>/dev/null; then
+if command -v flux &>/dev/null && kubectl get namespace flux-system &>/dev/null; then
   echo -e "${GREEN}[INFO]${NC} Triggering Flux to reconcile GitRepository (retry clone)..."
   flux reconcile source git brightlab -n flux-system --timeout=2m || true
   echo -e "${GREEN}[INFO]${NC} Triggering Flux to reconcile all Kustomizations and HelmReleases..."

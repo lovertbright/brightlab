@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m
-  url: https://github.com/lovertbright/brightlab.git
+  url: https://github.com/xmaeltht/mkloudlab.git
   ref:
     branch: main
   ignore: |

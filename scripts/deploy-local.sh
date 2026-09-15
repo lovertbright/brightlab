@@ -116,6 +116,14 @@ step_flux_configure() {
   pause
 }
 
+step_keycloak_secrets() {
+  heading "Step 4b: Seed Keycloak DB + admin secrets"
+  cd "$REPO_ROOT"
+  info "External Secrets Operator needs these in place before Keycloak's ExternalSecrets can sync."
+  task secrets:keycloak-db
+  pause
+}
+
 step_apps() {
   heading "Step 5: Deploy applications (Flux apps)"
   cd "$REPO_ROOT"
@@ -146,6 +154,7 @@ run_full() {
   step_cloudflare
   step_flux
   step_flux_configure
+  step_keycloak_secrets
   step_apps
   step_certificates
   step_status
@@ -163,12 +172,13 @@ run_step_by_step() {
     echo "  3) Cloudflare token (TLS)"
     echo "  4) Install Flux"
     echo "  5) Configure Flux GitRepository"
+    echo "  5b) Seed Keycloak DB + admin secrets (required before deploying apps)"
     echo "  6) Deploy apps (Flux) – Keycloak, MinIO, observability, etc."
     echo "  7) Certificates"
     echo "  8) Show status"
     echo "  q) Quit"
     echo ""
-    read -p "Choice [1, 1b, 2-8, q]: " choice
+    read -p "Choice [1, 1b, 2-5, 5b, 6-8, q]: " choice
     case "$choice" in
       1) step_infrastructure ;;
       1b) step_fix_dns ;;
@@ -176,6 +186,7 @@ run_step_by_step() {
       3) step_cloudflare ;;
       4) step_flux ;;
       5) step_flux_configure ;;
+      5b) step_keycloak_secrets ;;
       6) step_apps ;;
       7) step_certificates ;;
       8) step_status ;;

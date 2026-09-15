@@ -81,7 +81,12 @@ task install:flux
 # 2. Configure the GitRepository
 task flux:configure-repo
 
-# 3. Deploy Applications
+# 3. Seed Keycloak's DB + admin credentials (required BEFORE apps are registered —
+#    External Secrets Operator syncs these into the keycloak namespace; without this
+#    step the Keycloak/PostgreSQL pods will hang waiting on secrets that don't exist)
+task secrets:keycloak-db
+
+# 4. Deploy Applications
 task install:apps
 ```
 flux will now automatically reconcile the state. You can check progress with:
@@ -91,9 +96,23 @@ task flux:status
 flux get all -n flux-system
 ```
 
+To watch Keycloak specifically as it comes up:
+```bash
+kubectl get externalsecrets -n keycloak          # should show SYNCED
+kubectl get pods -n keycloak -w                  # keycloak-postgresql-0, then keycloak-*
+flux get helmrelease keycloak -n keycloak
+```
+Default admin login is `admin` / `Keycloak123!` (or whatever you set via `KEYCLOAK_ADMIN_USER`/`KEYCLOAK_ADMIN_PASSWORD` env vars before running `task secrets:keycloak-db` — see that task in `Taskfile.yml`). **Change this password immediately after first login.**
+
+Once the pod is `Running` and healthy, reach it at `https://keycloak.lbrightlab.com` (via the Istio Gateway + cert-manager TLS cert), or locally without DNS/TLS:
+```bash
+kubectl port-forward -n keycloak svc/keycloak-keycloak-keycloakx-http 8080:8080
+```
+then open http://localhost:8080. See `platform/identity/keycloak/README.md` for troubleshooting (CrashLoopBackOff, failing health probes, DB connectivity).
+
 ### 6. Post-Installation
-Configure sensitive resources that are not in Git.
-- **Keycloak & Secrets**: See `infrastructure/terraform/keycloak-realm`.
+Configure realms, clients, and roles declaratively with OpenTofu (optional, run after Keycloak is up and reachable).
+- **Keycloak Realm Config**: See `infrastructure/terraform/keycloak-realm/README.md`.
 
 ---
 
