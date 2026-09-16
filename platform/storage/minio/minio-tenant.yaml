@@ -5,6 +5,10 @@ metadata:
   name: minio
   namespace: minio
 spec:
+  # Docker Hub blocks anonymous pulls of old minio/minio release tags;
+  # pull the same release from quay.io instead (operator's default points at docker.io).
+  image: quay.io/minio/minio:RELEASE.2024-10-02T17-50-41Z
+
   # Number of MinIO servers
   pools:
     - servers: 1
