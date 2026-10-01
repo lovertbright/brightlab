@@ -6,9 +6,11 @@ This configuration is designed to be run **after** Keycloak has been deployed to
 
 ## Prerequisites
 
-- **OpenTofu:** You must have `opentofu` installed. These scripts are written for OpenTofu, the open-source fork of Terraform.
+- **OpenTofu:** You must have `tofu` installed. These scripts are written for OpenTofu, the open-source fork of Terraform.
 - **Keycloak Instance:** A running Keycloak instance accessible from where you are running the `tofu` commands.
-- **Keycloak Provider Credentials:** You need the Keycloak URL and admin credentials. These are configured in the `terraform.tfvars` file.
+- **Keycloak Provider Credentials:** You need the Keycloak URL and admin credentials configured in `terraform.tfvars`.
+- **MinIO Backend:** The `brightlab-bucket` bucket must exist on `https://minio.lbrightlab.com`.
+- **AWS CLI:** Required to create or verify the MinIO backend bucket.
 
 ## Configuration Overview
 
@@ -27,36 +29,63 @@ Before running OpenTofu, you must fill in the required values in the `terraform.
 ```hcl
 # terraform.tfvars
 
-keycloak_url      = "https://keycloak.your-domain.com" # Replace with your Keycloak URL
-keycloak_user     = "admin"
-keycloak_password = "your-admin-password"      # Replace with your admin password
+kc_url        = "https://keycloak.your-domain.com/" # Replace with your Keycloak URL
+kc_admin_user = "admin"
+kc_admin_pass = "your-admin-password"               # Replace with your admin password
 ```
 
-### 2. Initialize OpenTofu
+Use the password for the existing Keycloak `admin` account. Updating the
+Kubernetes `keycloak-admin` Secret does not change the password in an existing
+Keycloak database.
 
-Navigate to this directory and run the `init` command. This will download the required Keycloak provider plugin.
+### 2. Configure the MinIO Backend
+
+The backend uses the MinIO S3-compatible endpoint and stores state in
+`brightlab-bucket`. Set credentials for the MinIO tenant before running
+OpenTofu. Do not use stale AWS profile credentials.
 
 ```bash
-opentofu init
+export AWS_ACCESS_KEY_ID="<minio-access-key>"
+export AWS_SECRET_ACCESS_KEY="<minio-secret-key>"
+export AWS_DEFAULT_REGION="us-east-1"
 ```
 
-### 3. Plan the Changes
+The credentials must match the MinIO tenant configuration. Create the bucket
+once if it does not already exist:
+
+```bash
+aws --endpoint-url https://minio.lbrightlab.com \
+	s3api create-bucket --bucket brightlab-bucket
+```
+
+If the bucket already exists, the create command can be skipped.
+
+### 3. Initialize OpenTofu
+
+Navigate to this directory and run `init`. Use `-reconfigure` after changing
+backend settings or when initializing this directory for the first time.
+
+```bash
+tofu init -reconfigure
+```
+
+### 4. Plan the Changes
 
 Run the `plan` command to see what changes OpenTofu will make to your Keycloak instance. This is a dry run and is safe to execute.
 
 ```bash
-opentofu plan
+tofu plan
 ```
 
-### 4. Apply the Configuration
+### 5. Apply the Configuration
 
 If the plan looks correct, apply the changes to configure Keycloak.
 
 ```bash
-opentofu apply --auto-approve
+tofu apply --auto-approve
 ```
 
-### 5. Create Kubernetes Secrets (Optional)
+### 6. Create Kubernetes Secrets (Optional)
 
 After applying the configuration, OpenTofu will output sensitive data like client secrets. The `secret.sh` script is designed to take these outputs and create the necessary Kubernetes secrets for other applications.
 
@@ -68,3 +97,22 @@ chmod +x secret.sh
 ```
 
 This script uses the `tofu output` command to fetch the required values and `kubectl` to create the secrets in the appropriate namespaces.
+
+## Troubleshooting
+
+### `401 Unauthorized` from the Keycloak provider
+
+The provider must authenticate to the `master` realm before it can create a
+plan. Confirm that `kc_url` has no trailing slash and that `kc_admin_user` and
+`kc_admin_pass` match the current Keycloak admin account. A response containing
+`invalid_grant: Invalid user credentials` indicates a password mismatch, not a
+state or infrastructure change.
+
+If the Kubernetes Secret was changed after Keycloak was initialized, reset the
+existing Keycloak admin password through the Keycloak administration interface
+or another authorized administrative procedure, then update `terraform.tfvars`.
+
+If Keycloak displays “You need local access to create the initial admin user”,
+the deployment is missing `KEYCLOAK_ADMIN` and `KEYCLOAK_ADMIN_PASSWORD` at
+startup. Apply the Keycloak HelmRelease configuration, restart Keycloak, and
+wait for the initial admin account to be created before running `tofu plan`.
