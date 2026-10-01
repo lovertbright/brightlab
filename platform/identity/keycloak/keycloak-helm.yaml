@@ -24,7 +24,8 @@ spec:
     image:
       tag: "21.1.2"
 
-    # Admin Credentials - Using External Secrets
+    # Admin Credentials - Using External Secrets. These variables are required
+    # to create the initial admin user when the Keycloak database is empty.
     existingSecret: "keycloak-admin"
     existingSecretKey: "password"
 
@@ -42,6 +43,16 @@ spec:
     # Configure environment variables for database connection
     # Using YAML literal block scalar format (the chart expects a string that will be parsed as YAML)
     extraEnv: |
+      - name: KEYCLOAK_ADMIN
+        valueFrom:
+          secretKeyRef:
+            name: keycloak-admin
+            key: username
+      - name: KEYCLOAK_ADMIN_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: keycloak-admin
+            key: password
       - name: KC_DB
         value: postgres
       - name: KC_DB_URL_HOST

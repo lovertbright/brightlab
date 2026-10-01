@@ -14,9 +14,9 @@ terraform {
     skip_requesting_account_id  = true
     use_path_style              = true
 
-    # Credentials - use environment variables for security:
-    # export AWS_ACCESS_KEY_ID="terraform"
-    # export AWS_SECRET_ACCESS_KEY="terraformS3cret2024MinIO"
+    # Credentials - use the values configured for the MinIO tenant:
+    # export AWS_ACCESS_KEY_ID="<minio-access-key>"
+    # export AWS_SECRET_ACCESS_KEY="<minio-secret-key>"
     # export AWS_ENDPOINT_URL_S3="https://minio.lbrightlab.com"
   }
 }
